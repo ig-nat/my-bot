@@ -110,6 +110,9 @@ moderator_full = InlineKeyboardMarkup(
             InlineKeyboardButton(text="❌ Отменить", callback_data="cancel_registration")
         ],
         [
+            InlineKeyboardButton(text="📋 Копировать адрес", callback_data="copy_address")
+        ],
+        [
             InlineKeyboardButton(text="——— ПРОБЛЕМЫ СО СВЯЗЬЮ ———", callback_data="ignore")
         ],
         [

@@ -1064,6 +1064,7 @@ async def ops_final_step(message: Message, state: FSMContext):
 
         group_message_id = data.get("group_message_id")
         adres = data.get("adres")
+        city = storage_data.get("city", "Город не указан")  # ← ДОБАВЬ
 
         if not group_message_id or not adres:
             raise ValueError("ID сообщения в группе или адрес отсутствует")
@@ -1154,6 +1155,7 @@ async def tv_final_step(message: Message, state: FSMContext):
 
         group_message_id = data.get("group_message_id")
         adres = data.get("adres")
+        city = storage_data.get("city", "Город не указан")  # ← ДОБАВЬ
 
         if not group_message_id or not adres:
             raise ValueError("ID сообщения в группе или адрес отсутствует")
@@ -1321,63 +1323,47 @@ async def save_adres(message: Message, state: FSMContext):
 
 
 @router.message(Reg.photo3)
-async def save_adres(message: Message, state: FSMContext):
+async def save_photo3(message: Message, state: FSMContext):
     if message.text == "❌ Отмена":
         await state.clear()
         await message.answer("❎ Регистрация отменена", reply_markup=kb.main)
         return
 
     if message.content_type == ContentType.PHOTO:
-        # Проверяем, что отправлено только одно фото
         if hasattr(message, 'media_group_id') and message.media_group_id:
             await message.answer("📸 Пожалуйста, отправляйте фотографии по одной, а не группой.")
             return
         
         try:
-            # Сохраняем фото в папку
-            photo = message.photo[-1]
-            file = await message.bot.get_file(photo.file_id)
-            file_bytes = BytesIO()
-            await message.bot.download_file(file.file_path, destination=file_bytes)
-            file_bytes.seek(0)
-            data = file_bytes.read()
-            saved_path = save_photo_file(data)
-            
-            # Получаем все данные из состояния
-            data_state = await state.get_data()
-            photo1_file_id = data_state.get('photo')
-            photo2_file_id = data_state.get('photo2')
-            photo3_file_id = message.photo[-1].file_id
-            photo1_path = data_state.get('photo_path')
-            photo2_path = data_state.get('photo2_path')
-            photo3_path = saved_path
-            adres = data_state.get('adres')
+            data = await state.get_data()
+            photo = data.get('photo')
+            photo2 = data.get('photo2')
+            photo3 = message.photo[-1].file_id
+            adres = data.get('adres')
+            city = data.get('city')  # ← ДОБАВИЛИ ГОРОД
 
-            if None in (photo1_file_id, photo2_file_id, photo3_file_id, adres):
+            if None in (photo, photo2, photo3, adres, city):  # ← ПРОВЕРЯЕМ ГОРОД
                 raise ValueError("Не все данные получены")
 
             user_name = message.from_user.full_name
 
-            # Отправляем информацию о заявке с повторными попытками
+            # Отправляем информацию о заявке с городом
             await send_message_with_retry(
                 message.bot,
                 chat_id=GROUP_ID,
-                text=f"Отправитель: {user_name}\nАдрес: {adres}",
+                text=f"Отправитель: {user_name}\n🏙️ Город: {city}\nАдрес: {adres}",  # ← ДОБАВИЛИ ГОРОД
                 reply_markup=ReplyKeyboardRemove()
             )
 
-            # Используем file_id для отправки в группу (как было раньше)
             media = [
-                InputMediaPhoto(media=photo1_file_id, caption=f"Фото экрана от {user_name}"),
-                InputMediaPhoto(media=photo2_file_id, caption=f"Серийник ТВ от {user_name}"),
-                InputMediaPhoto(media=photo3_file_id, caption=f"Серийник ПК от {user_name}")
+                InputMediaPhoto(media=photo, caption=f"Фото экрана от {user_name}"),
+                InputMediaPhoto(media=photo2, caption=f"Серийник ТВ от {user_name}"),
+                InputMediaPhoto(media=photo3, caption=f"Серийник ПК от {user_name}")
             ]
 
-            # Используем безопасную отправку медиа-группы
             sent_messages = await safe_send_media_group(message.bot, GROUP_ID, media)
             media_group_ids = [msg.message_id for msg in sent_messages]
 
-            # Отправляем сообщение с кнопками
             button_message = await send_message_with_retry(
                 message.bot,
                 chat_id=GROUP_ID,
@@ -1386,7 +1372,7 @@ async def save_adres(message: Message, state: FSMContext):
                 reply_to_message_id=media_group_ids[0]
             )
 
-            # Сохраняем информацию о заявке с адресом
+            # Сохраняем информацию о заявке с адресом И городом
             storage[media_group_ids[0]] = {
                 "user_id": message.from_user.id,
                 "user_name": user_name,
@@ -1394,17 +1380,17 @@ async def save_adres(message: Message, state: FSMContext):
                 "is_accepted": False,
                 "media": media,
                 "media_group_ids": media_group_ids,
-                "adres": adres  # Добавляем адрес в хранилище
+                "adres": adres,
+                "city": city  # ← ДОБАВИЛИ ГОРОД В STORAGE
             }
             
-            # Сохраняем в базу данных с путями к фото
+            # Сохраняем в базу данных
             db.save_request(
                 request_id=str(media_group_ids[0]),
                 user_id=message.from_user.id,
                 user_name=user_name,
-                address=adres,
-                request_type="regular",
-                photo_path=f"{photo1_path};{photo2_path};{photo3_path}"  # Сохраняем все пути через ;
+                address=f"{city}, {adres}",  # ← ГОРОД + АДРЕС В БД
+                request_type="regular"
             )
 
             await message.answer(
@@ -1414,9 +1400,8 @@ async def save_adres(message: Message, state: FSMContext):
             await state.update_data(group_message_id=media_group_ids[0])
             await state.set_state(Reg.final_photo)
 
-            # Добавляем логирование
-            logger.info(f"📝 Заявка от {user_name} создана с адресом: {adres}")
-            logger.info(f"📸 Все фото сохранены: {photo1_path}, {photo2_path}, {photo3_path}")
+            # Добавляем логирование с городом
+            logger.info(f"📝 Заявка от {user_name} создана с городом: {city}, адресом: {adres}")
 
         except Exception as e:
             logger.error(f"Ошибка при отправке данных: {str(e)}", exc_info=True)
@@ -1737,11 +1722,14 @@ async def handle_gid(message: Message, state: FSMContext):
         
         # Получаем адрес из данных заявки
         address = storage_data.get("adres", "Адрес не указан")
-        
+        city = storage_data.get("city", "Город не указан")  # ← ДОБАВЬ ЭТУ СТРОКУ
+
         if media:
             try:
                 # Формируем текст с пометкой типа замены
                 info_text = f"Отправитель: {user_name}\nАдрес: {address}"
+                # И обнови отправку:
+                info_text = f"Отправитель: {user_name}\n🏙️ Город: {city}\nАдрес: {address}"  # ← ОБНОВИ
                 if replacement_type == "OPS":
                     info_text = f"🔧 **ЗАМЕНА OPS** 🔧\n{info_text}"
                 
@@ -1809,6 +1797,9 @@ async def handle_gid(message: Message, state: FSMContext):
         connection_buttons = InlineKeyboardMarkup(
     inline_keyboard=[
         [
+            InlineKeyboardButton(text="📋 Копировать адрес", callback_data="copy_address")
+        ],
+        [
             InlineKeyboardButton(text="——— ПРОБЛЕМЫ СО СВЯЗЬЮ ———", callback_data="ignore")
         ],
         [
@@ -1824,6 +1815,7 @@ async def handle_gid(message: Message, state: FSMContext):
         ]
     ]
 )
+
 
         
         try:
@@ -1933,7 +1925,7 @@ async def accept_registration(callback: CallbackQuery, state: FSMContext):
 
 
 @router.message(Reg.final_photo)
-async def save_adres(message: Message, state: FSMContext):
+async def final_step(message: Message, state: FSMContext):
     try:
         data = await state.get_data()
         if data.get("final_photo_sent", False):
@@ -1946,6 +1938,7 @@ async def save_adres(message: Message, state: FSMContext):
 
         group_message_id = data.get("group_message_id")
         adres = data.get("adres")
+        city = data.get("city", "Город не указан")  # ← ПРАВИЛЬНО: из data, а не storage_data
 
         if not group_message_id or not adres:
             raise ValueError("ID сообщения в группе или адрес отсутствует")
@@ -1956,7 +1949,7 @@ async def save_adres(message: Message, state: FSMContext):
             await state.clear()
             return
             
-        storage_data = storage.get(group_message_id)
+        storage_data = storage.get(group_message_id)  # ← ВОТ ГДЕ ОПРЕДЕЛЯЕТСЯ storage_data
         if not storage_data or not storage_data.get("is_accepted", False):
             await message.answer("⏳ Заявка еще не одобрена. Ожидайте! ")
             return
@@ -1967,8 +1960,12 @@ async def save_adres(message: Message, state: FSMContext):
         photo_id = message.photo[-1].file_id
         user_name = message.from_user.full_name
         
-        # Отправляем информацию о финальной заявке
-        info_text = f"Финальное фото от {user_name}\nАдрес: {adres}\nGiD: {gid}"
+        # Отправляем информацию о финальной заявке С ГОРОДОМ
+        info_text = f"Финальное фото от {user_name}\n🏙️ Город: {city}\nАдрес: {adres}\nGiD: {gid}"
+        
+        # ... остальной код без изменений
+
+
         
         try:
             # Отправляем информацию о финальной заявке
@@ -2926,6 +2923,113 @@ async def ignore_callback(callback: CallbackQuery):
 @router.callback_query(F.data == "contact_user")
 async def contact_user(callback: CallbackQuery):
     try:
+        # ... существующий код ...
+        await callback.answer("✅ Ссылка создана")
+        
+    except Exception as e:
+        logger.error(f"Ошибка при создании связи с монтажником: {str(e)}", exc_info=True)
+        await callback.answer("❌ Ошибка при создании ссылки")
+
+# ← ВСТАВЬ СЮДА НОВЫЙ ОБРАБОТЧИК
+@router.callback_query(F.data == "copy_address")
+async def copy_address(callback: CallbackQuery):
+    try:
+        # Проверяем наличие reply_to_message
+        if not callback.message or not callback.message.reply_to_message:
+            await callback.answer("❌ Не удалось определить заявку")
+            return
+            
+        group_message_id = callback.message.reply_to_message.message_id
+        
+        # Проверяем наличие заявки в хранилище
+        if group_message_id not in storage:
+            logger.warning(f"Заявка с ID {group_message_id} не найдена в хранилище")
+            await callback.answer("❌ Заявка не найдена в системе")
+            return
+
+        user_data = storage[group_message_id]
+        adres = user_data.get("adres", "")
+        
+        if not adres:
+            await callback.answer("❌ Адрес не найден")
+            return
+
+        # Отправляем ТОЛЬКО адрес в удобном для копирования формате
+        copy_message = await callback.message.answer(
+            f"📋 **Адрес для копирования:**\n\n`{adres}`\n\n"
+            f"👆 *Нажмите на адрес для копирования*\n"
+            f"🗑️ *Сообщение удалится через 10 секунд*",
+            parse_mode="Markdown"
+        )
+        
+        await callback.answer("📋 Адрес готов к копированию")
+        
+        # Удаляем сообщение через 10 секунд
+        await asyncio.sleep(10)
+        await safe_delete_message(callback.bot, GROUP_ID, copy_message.message_id)
+        
+    except Exception as e:
+        logger.error(f"Ошибка при копировании адреса: {str(e)}", exc_info=True)
+        await callback.answer("❌ Ошибка при получении адреса")
+
+
+
+@router.callback_query(F.data == "bad_connection")
+async def handle_bad_connection(callback: CallbackQuery):
+    try:
+        # Проверяем наличие reply_to_message
+        if not callback.message or not callback.message.reply_to_message:
+            await callback.answer("❌ Не удалось определить заявку")
+            return
+            
+        group_message_id = callback.message.reply_to_message.message_id
+        
+        # Проверяем наличие заявки в хранилище
+        if group_message_id not in storage:
+            logger.warning(f"Заявка с ID {group_message_id} не найдена в хранилище")
+            await callback.answer("❌ Заявка не найдена в системе")
+            return
+
+        user_id = storage[group_message_id]["user_id"]
+
+        # Создаем клавиатуру для проверки связи
+        check_connection_kb = InlineKeyboardMarkup(inline_keyboard=[
+            [InlineKeyboardButton(text="✅ Я ВЫПОЛНИЛ, ПРОВЕРЬТЕ СВЯЗЬ ЕЩЁ РАЗ", callback_data="check_connection_again")]
+        ])
+
+        # Используем функцию с повторными попытками
+        await send_message_with_retry(
+            callback.bot,
+            chat_id=user_id,
+            text="⚠️ Связь с телевизором есть, НО не стабильна. Проверьте соединения, разъём RJ45, попробуйте сменить порт.",
+            reply_markup=check_connection_kb
+        )
+
+        # Удаляем предыдущие статусные сообщения
+        if "status_messages" in storage[group_message_id]:
+            for msg_id in storage[group_message_id]["status_messages"]:
+                await safe_delete_message(callback.bot, GROUP_ID, msg_id)
+
+        # Отправляем новое статусное сообщение
+        status_msg = await send_message_with_retry(
+            callback.bot,
+            chat_id=GROUP_ID,
+            text=f"⚠️ Уведомление о плохой связи отправлено пользователю.\nОтправил: {callback.from_user.full_name}",
+            reply_to_message_id=group_message_id
+        )
+
+        # Сохраняем ID нового статусного сообщения
+        storage[group_message_id]["status_messages"] = [status_msg.message_id]
+
+        await callback.answer("✅ Пользователь уведомлен о плохой связи")
+
+    except Exception as e:
+        logger.error(f"Ошибка при обработке плохой связи: {str(e)}", exc_info=True)
+        await callback.answer("❌ Ошибка")
+
+@router.callback_query(F.data == "contact_user")
+async def contact_user(callback: CallbackQuery):
+    try:
         # Проверяем наличие reply_to_message
         if not callback.message or not callback.message.reply_to_message:
             await callback.answer("❌ Не удалось определить заявку")
@@ -2965,6 +3069,7 @@ async def contact_user(callback: CallbackQuery):
     except Exception as e:
         logger.error(f"Ошибка при создании связи с монтажником: {str(e)}", exc_info=True)
         await callback.answer("❌ Ошибка при создании ссылки")
+
 
 
 
