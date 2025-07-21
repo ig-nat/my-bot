@@ -193,41 +193,7 @@ async def with_rate_limit(func, *args, **kwargs):
                     raise
                 await asyncio.sleep(1)
 
-@router.message(F.content_type == ContentType.PHOTO)
-async def handle_photo(message: Message):
-    try:
-        photo = message.photo[-1]
-        # Получаем объект File через bot.get_file
-        file = await message.bot.get_file(photo.file_id)
-        
-        # Создаём BytesIO для хранения файла
-        file_bytes = BytesIO()
-        
-        # Скачиваем файл по file_path в BytesIO
-        await message.bot.download_file(file.file_path, destination=file_bytes)
-        
-        file_bytes.seek(0)
-        data = file_bytes.read()
 
-        saved_path = save_photo_file(data)
-        request_id = str(uuid.uuid4())
-
-        db.save_request(
-            request_id=request_id,
-            user_id=message.from_user.id,
-            user_name=message.from_user.full_name or "",
-            address="",
-            request_type="regular",
-            gid="",
-            photo_path=saved_path
-        )
-
-        await message.answer("✅ Фото сохранено и заявка зарегистрирована.")
-
-    except Exception as e:
-        await message.answer("❌ Ошибка при сохранении фото.")
-        import logging
-        logging.error(f"Ошибка в handle_photo: {e}", exc_info=True)
 
 
 @router.message(Command("refresh"))
@@ -1190,12 +1156,29 @@ async def save_photo1(message: Message, state: FSMContext):
             await message.answer("📸 Пожалуйста, отправляйте фотографии по одной, а не группой.")
             return
         
-        await state.update_data(photo=message.photo[-1].file_id)
-        await state.set_state(Reg.photo2)
-        await message.answer("📸 Фото принято!" \
-        " Теперь фото наклейки с серийным номером телевизора", reply_markup=kb.cancel_kb)
+        try:
+            # Сохраняем фото в папку
+            photo = message.photo[-1]
+            file = await message.bot.get_file(photo.file_id)
+            file_bytes = BytesIO()
+            await message.bot.download_file(file.file_path, destination=file_bytes)
+            file_bytes.seek(0)
+            data = file_bytes.read()
+            saved_path = save_photo_file(data)
+            
+            # Сохраняем file_id для отправки в группу И путь к файлу
+            await state.update_data(photo=message.photo[-1].file_id, photo_path=saved_path)
+            await state.set_state(Reg.photo2)
+            await message.answer("📸 Фото принято! Теперь фото наклейки с серийным номером телевизора", reply_markup=kb.cancel_kb)
+            
+            logger.info(f"📸 Первое фото сохранено: {saved_path}")
+            
+        except Exception as e:
+            logger.error(f"Ошибка при сохранении первого фото: {str(e)}", exc_info=True)
+            await message.answer("❌ Ошибка при сохранении фото. Попробуйте ещё раз.")
     else:
         await message.answer("📸 Пожалуйста, фото СИРЕНЕВОГО экрана.")
+
 
 
 @router.message(Reg.photo2)
@@ -1211,14 +1194,29 @@ async def save_photo2(message: Message, state: FSMContext):
             await message.answer("📸 Пожалуйста, отправляйте фотографии по одной, а не группой.")
             return
         
-        
-        await state.update_data(photo2=message.photo[-1].file_id)
-        await state.set_state(Reg.photo3)
-        await message.answer("📸 Фото принято! " \
-        "Теперь фото наклейки с серийным номером компьютера (ОПС)", reply_markup=kb.cancel_kb)
+        try:
+            # Сохраняем фото в папку
+            photo = message.photo[-1]
+            file = await message.bot.get_file(photo.file_id)
+            file_bytes = BytesIO()
+            await message.bot.download_file(file.file_path, destination=file_bytes)
+            file_bytes.seek(0)
+            data = file_bytes.read()
+            saved_path = save_photo_file(data)
+            
+            # Сохраняем file_id для отправки в группу И путь к файлу
+            await state.update_data(photo2=message.photo[-1].file_id, photo2_path=saved_path)
+            await state.set_state(Reg.photo3)
+            await message.answer("📸 Фото принято! Теперь фото наклейки с серийным номером компьютера (ОПС)", reply_markup=kb.cancel_kb)
+            
+            logger.info(f"📸 Второе фото сохранено: {saved_path}")
+            
+        except Exception as e:
+            logger.error(f"Ошибка при сохранении второго фото: {str(e)}", exc_info=True)
+            await message.answer("❌ Ошибка при сохранении фото. Попробуйте ещё раз.")
     else:
-        await message.answer("📸 Пожалуйста, фото" \
-        " наклейки с серийным номером телевизора.")
+        await message.answer("📸 Пожалуйста, фото наклейки с серийным номером телевизора.")
+
 
 
 @router.message(Reg.photo3)
@@ -1235,13 +1233,26 @@ async def save_photo3(message: Message, state: FSMContext):
             return
         
         try:
-            data = await state.get_data()
-            photo = data.get('photo')
-            photo2 = data.get('photo2')
-            photo3 = message.photo[-1].file_id
-            adres = data.get('adres')
+            # Сохраняем фото в папку
+            photo = message.photo[-1]
+            file = await message.bot.get_file(photo.file_id)
+            file_bytes = BytesIO()
+            await message.bot.download_file(file.file_path, destination=file_bytes)
+            file_bytes.seek(0)
+            data = file_bytes.read()
+            saved_path = save_photo_file(data)
+            
+            # Получаем все данные из состояния
+            data_state = await state.get_data()
+            photo1_file_id = data_state.get('photo')
+            photo2_file_id = data_state.get('photo2')
+            photo3_file_id = message.photo[-1].file_id
+            photo1_path = data_state.get('photo_path')
+            photo2_path = data_state.get('photo2_path')
+            photo3_path = saved_path
+            adres = data_state.get('adres')
 
-            if None in (photo, photo2, photo3, adres):
+            if None in (photo1_file_id, photo2_file_id, photo3_file_id, adres):
                 raise ValueError("Не все данные получены")
 
             user_name = message.from_user.full_name
@@ -1254,10 +1265,11 @@ async def save_photo3(message: Message, state: FSMContext):
                 reply_markup=ReplyKeyboardRemove()
             )
 
+            # Используем file_id для отправки в группу (как было раньше)
             media = [
-                InputMediaPhoto(media=photo, caption=f"Фото экрана от {user_name}"),
-                InputMediaPhoto(media=photo2, caption=f"Серийник ТВ от {user_name}"),
-                InputMediaPhoto(media=photo3, caption=f"Серийник ПК от {user_name}")
+                InputMediaPhoto(media=photo1_file_id, caption=f"Фото экрана от {user_name}"),
+                InputMediaPhoto(media=photo2_file_id, caption=f"Серийник ТВ от {user_name}"),
+                InputMediaPhoto(media=photo3_file_id, caption=f"Серийник ПК от {user_name}")
             ]
 
             # Используем безопасную отправку медиа-группы
@@ -1283,15 +1295,16 @@ async def save_photo3(message: Message, state: FSMContext):
                 "media_group_ids": media_group_ids,
                 "adres": adres  # Добавляем адрес в хранилище
             }
-            # Сохраняем в базу данных
+            
+            # Сохраняем в базу данных с путями к фото
             db.save_request(
                 request_id=str(media_group_ids[0]),
                 user_id=message.from_user.id,
                 user_name=user_name,
                 address=adres,
-                request_type="regular"
+                request_type="regular",
+                photo_path=f"{photo1_path};{photo2_path};{photo3_path}"  # Сохраняем все пути через ;
             )
-
 
             await message.answer(
                 "✅ заявка отправлена, ожидайте.",
@@ -1302,6 +1315,7 @@ async def save_photo3(message: Message, state: FSMContext):
 
             # Добавляем логирование
             logger.info(f"📝 Заявка от {user_name} создана с адресом: {adres}")
+            logger.info(f"📸 Все фото сохранены: {photo1_path}, {photo2_path}, {photo3_path}")
 
         except Exception as e:
             logger.error(f"Ошибка при отправке данных: {str(e)}", exc_info=True)
