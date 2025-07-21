@@ -106,9 +106,6 @@ catalog5 = InlineKeyboardMarkup(
 moderator_full = InlineKeyboardMarkup(
     inline_keyboard=[
         [
-            InlineKeyboardButton(text="——— ОСНОВНЫЕ ДЕЙСТВИЯ ———", callback_data="ignore")
-        ],
-        [
             InlineKeyboardButton(text="✅ Принять", callback_data="accept_registration"),
             InlineKeyboardButton(text="❌ Отменить", callback_data="cancel_registration")
         ],
@@ -122,9 +119,13 @@ moderator_full = InlineKeyboardMarkup(
         [
             InlineKeyboardButton(text="🔄 СМЕНА ПОРТА", callback_data="change_port"),
             InlineKeyboardButton(text="🔌 ПЕРЕЗАГРУЗИ ТВ", callback_data="restart_tv")
+        ],
+        [
+            InlineKeyboardButton(text="💬 СВЯЗЬ С МОНТАЖНИКОМ", callback_data="contact_user")
         ]
     ]
 )
+
 
 # Клавиатура для проверки связи
 check_connection_kb = InlineKeyboardMarkup(

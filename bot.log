@@ -4755,3 +4755,413 @@ aiogram.exceptions.TelegramBadRequest: Telegram server says - Bad Request: query
 2025-07-21 22:34:03,062 - app.handlers - ИНФО - 📸 Все фото сохранены: c:\Users\G\PycharmProjects\Bot __v.1.7 betta_много_кнопок\app\photos\c3aafe6a-86f3-4f84-bc91-c93e34f28bf4.jpg, c:\Users\G\PycharmProjects\Bot __v.1.7 betta_много_кнопок\app\photos\ca1495b4-d00c-4f72-8f4a-f00e3f428b1c.jpg, c:\Users\G\PycharmProjects\Bot __v.1.7 betta_много_кнопок\app\photos\9f92e6f8-076f-4b96-aea4-82205f2828c4.jpg
 2025-07-21 22:35:50,248 - app.handlers - ИНФО - 📤 Заявка от Руслан Керейтов отправлена инженерам с адресом: Оаоа, GiD: аыкпкпук пекпукре, тип: обычная регистрация
 2025-07-21 22:35:50,426 - app.database - ИНФО - GiD заявки 7939 обновлен: аыкпкпук пекпукре
+2025-07-21 22:40:34,365 - __main__ - ИНФО - 🎯 Запуск главного процесса бота на Windows
+2025-07-21 22:40:34,365 - __main__ - ИНФО - 📄 Файл лога: bot.log
+2025-07-21 22:40:35,046 - app.bot - ИНФО - 🚀 Бот запущен на Windows и готов к работе
+2025-07-21 22:40:35,046 - app.bot - ИНФО - 📄 Файл лога: bot.log
+2025-07-21 22:40:35,176 - app.bot - ИНФО - Админ-панель отправлена в группу -1002392016711
+2025-07-21 22:40:35,176 - app.bot - ИНФО - 📡 Запуск поллинга...
+2025-07-21 22:40:52,719 - app.handlers - ИНФО - 👤 Пользователь Игнат (ID: 1602581828) начал регистрацию
+2025-07-21 22:40:55,880 - app.handlers - ИНФО - 📍 Пользователь Игнат ввел адрес: Еокоырьвгд
+2025-07-21 22:40:59,077 - app.handlers - ИНФО - 📸 Первое фото сохранено: c:\Users\G\PycharmProjects\Bot __v.1.7 betta_много_кнопок\app\photos\0bef6e82-8d33-47ee-98a0-4f9d24bdab83.jpg
+2025-07-21 22:41:01,602 - app.handlers - ИНФО - 📸 Второе фото сохранено: c:\Users\G\PycharmProjects\Bot __v.1.7 betta_много_кнопок\app\photos\a233d560-9f24-4719-9ad7-7ffab2279ebb.jpg
+2025-07-21 22:41:05,200 - app.database - ИНФО - Заявка 7958 сохранена в БД с фото: c:\Users\G\PycharmProjects\Bot __v.1.7 betta_много_кнопок\app\photos\0bef6e82-8d33-47ee-98a0-4f9d24bdab83.jpg;c:\Users\G\PycharmProjects\Bot __v.1.7 betta_много_кнопок\app\photos\a233d560-9f24-4719-9ad7-7ffab2279ebb.jpg;c:\Users\G\PycharmProjects\Bot __v.1.7 betta_много_кнопок\app\photos\cbc8dec7-0afe-4543-8efe-e3cae69b26b4.jpg
+2025-07-21 22:41:05,360 - app.handlers - ИНФО - 📝 Заявка от Игнат создана с адресом: Еокоырьвгд
+2025-07-21 22:41:05,361 - app.handlers - ИНФО - 📸 Все фото сохранены: c:\Users\G\PycharmProjects\Bot __v.1.7 betta_много_кнопок\app\photos\0bef6e82-8d33-47ee-98a0-4f9d24bdab83.jpg, c:\Users\G\PycharmProjects\Bot __v.1.7 betta_много_кнопок\app\photos\a233d560-9f24-4719-9ad7-7ffab2279ebb.jpg, c:\Users\G\PycharmProjects\Bot __v.1.7 betta_много_кнопок\app\photos\cbc8dec7-0afe-4543-8efe-e3cae69b26b4.jpg
+2025-07-21 22:41:31,328 - app.handlers - ИНФО - БД обновлена: 7958 -> 7968
+2025-07-21 22:42:05,513 - app.handlers - ИНФО - 📸 Финальное фото от Игнат отправлено с адресом: Еокоырьвгд, GiD: GiD не указан
+2025-07-21 22:42:09,842 - app.database - ИНФО - Статус заявки 7968 обновлен на completed
+2025-07-21 22:42:10,194 - app.handlers - ИНФО - Заявка 525 (основная: 7968) успешно завершена для пользователя 1602581828
+2025-07-21 22:54:49,313 - app.handlers - ИНФО - 👤 Пользователь br4xe (ID: 612215418) начал регистрацию
+2025-07-21 22:54:53,065 - app.handlers - ИНФО - 📍 Пользователь br4xe ввел адрес: львладвдвьу
+2025-07-21 22:55:03,507 - app.handlers - ИНФО - 📸 Первое фото сохранено: c:\Users\G\PycharmProjects\Bot __v.1.7 betta_много_кнопок\app\photos\3e2f4f40-ffb1-4d89-9958-e282842ec117.jpg
+2025-07-21 22:55:10,828 - app.handlers - ИНФО - 👤 Пользователь Игнат (ID: 1602581828) начал регистрацию
+2025-07-21 22:55:14,002 - app.handlers - ИНФО - 📍 Пользователь Игнат ввел адрес: Nб
+2025-07-21 22:55:19,105 - app.handlers - ИНФО - 📸 Первое фото сохранено: c:\Users\G\PycharmProjects\Bot __v.1.7 betta_много_кнопок\app\photos\c58a184d-edb2-428b-9c8e-3767c9ec6765.jpg
+2025-07-21 22:55:20,000 - app.handlers - ИНФО - 📸 Второе фото сохранено: c:\Users\G\PycharmProjects\Bot __v.1.7 betta_много_кнопок\app\photos\99c96e50-dda4-47a7-bf04-c25f49b2408f.jpg
+2025-07-21 22:55:21,890 - app.handlers - ИНФО - 📸 Второе фото сохранено: c:\Users\G\PycharmProjects\Bot __v.1.7 betta_много_кнопок\app\photos\d0204f9f-1a76-44e7-a781-e13a40014de7.jpg
+2025-07-21 22:55:30,308 - app.database - ОШИБКА - Ошибка сохранения заявки в БД: database is locked
+2025-07-21 22:55:30,438 - app.handlers - ИНФО - 📝 Заявка от Игнат создана с адресом: Nб
+2025-07-21 22:55:30,439 - app.handlers - ИНФО - 📸 Все фото сохранены: c:\Users\G\PycharmProjects\Bot __v.1.7 betta_много_кнопок\app\photos\c58a184d-edb2-428b-9c8e-3767c9ec6765.jpg, c:\Users\G\PycharmProjects\Bot __v.1.7 betta_много_кнопок\app\photos\d0204f9f-1a76-44e7-a781-e13a40014de7.jpg, c:\Users\G\PycharmProjects\Bot __v.1.7 betta_много_кнопок\app\photos\9af45cfd-076d-40f0-8615-4e3ae7d75344.jpg
+2025-07-21 22:55:36,875 - app.database - ОШИБКА - Ошибка сохранения заявки в БД: database is locked
+2025-07-21 22:55:36,976 - app.handlers - ИНФО - 📝 Заявка от br4xe создана с адресом: львладвдвьу
+2025-07-21 22:55:36,977 - app.handlers - ИНФО - 📸 Все фото сохранены: c:\Users\G\PycharmProjects\Bot __v.1.7 betta_много_кнопок\app\photos\3e2f4f40-ffb1-4d89-9958-e282842ec117.jpg, c:\Users\G\PycharmProjects\Bot __v.1.7 betta_много_кнопок\app\photos\99c96e50-dda4-47a7-bf04-c25f49b2408f.jpg, c:\Users\G\PycharmProjects\Bot __v.1.7 betta_много_кнопок\app\photos\82bd935c-6e2a-4534-8b9e-465f61e76df3.jpg
+2025-07-21 22:56:31,048 - app.handlers - ИНФО - БД обновлена: 7978 -> 7993
+2025-07-21 22:56:43,575 - app.handlers - ИНФО - БД обновлена: 7983 -> 7999
+2025-07-21 22:57:31,715 - app.handlers - ИНФО - 📤 Заявка от br4xe отправлена инженерам с адресом: львладвдвьу, GiD: отлично, тип: обычная регистрация
+2025-07-21 22:57:31,830 - app.database - ИНФО - GiD заявки 7999 обновлен: отлично
+2025-07-21 22:57:54,925 - app.handlers - ИНФО - 📸 Финальное фото от br4xe отправлено с адресом: львладвдвьу, GiD: отлично
+2025-07-21 23:05:25,185 - app.database - ИНФО - Статус заявки 7999 обновлен на completed
+2025-07-21 23:05:25,514 - app.handlers - ИНФО - Заявка 528 (основная: 7999) успешно завершена для пользователя 612215418
+2025-07-21 23:57:27,338 - __main__ - ИНФО - 🎯 Запуск главного процесса бота на Windows
+2025-07-21 23:57:27,339 - __main__ - ИНФО - 📄 Файл лога: bot.log
+2025-07-21 23:57:27,999 - app.bot - ИНФО - 🚀 Бот запущен на Windows и готов к работе
+2025-07-21 23:57:27,999 - app.bot - ИНФО - 📄 Файл лога: bot.log
+2025-07-21 23:57:28,206 - app.bot - ИНФО - Админ-панель отправлена в группу -1002392016711
+2025-07-21 23:57:28,206 - app.bot - ИНФО - 📡 Запуск поллинга...
+2025-07-22 00:17:57,118 - __main__ - ИНФО - 🎯 Запуск главного процесса бота на Windows
+2025-07-22 00:17:57,119 - __main__ - ИНФО - 📄 Файл лога: bot.log
+2025-07-22 00:17:57,129 - app.bot - ИНФО - ✅ Redis подключен успешно
+2025-07-22 00:17:57,853 - app.bot - ИНФО - 🚀 Бот запущен на Windows и готов к работе
+2025-07-22 00:17:57,853 - app.bot - ИНФО - 📄 Файл лога: bot.log
+2025-07-22 00:17:58,016 - app.bot - ИНФО - Админ-панель отправлена в группу -1002392016711
+2025-07-22 00:17:58,018 - app.bot - ИНФО - 📡 Запуск поллинга...
+2025-07-22 00:20:08,804 - __main__ - ИНФО - 🎯 Запуск главного процесса бота на Windows
+2025-07-22 00:20:08,805 - __main__ - ИНФО - 📄 Файл лога: bot.log
+2025-07-22 00:20:08,815 - app.bot - ИНФО - ✅ Redis подключен успешно
+2025-07-22 00:20:09,491 - app.bot - ИНФО - 🚀 Бот запущен на Windows и готов к работе
+2025-07-22 00:20:09,492 - app.bot - ИНФО - 📄 Файл лога: bot.log
+2025-07-22 00:20:09,643 - app.bot - ИНФО - Админ-панель отправлена в группу -1002392016711
+2025-07-22 00:20:09,643 - app.bot - ИНФО - 📡 Запуск поллинга...
+2025-07-22 00:20:11,859 - aiogram.event - ОШИБКА - Cause exception while process update id=643758101 by bot id=8086321709
+AttributeError: 'Bot' object has no attribute 'fsm'
+Traceback (most recent call last):
+  File "C:\Users\G\PycharmProjects\Bot __v.1.7 betta_много_кнопок\.venv\Lib\site-packages\aiogram\dispatcher\dispatcher.py", line 309, in _process_update
+    response = await self.feed_update(bot, update, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\G\PycharmProjects\Bot __v.1.7 betta_много_кнопок\.venv\Lib\site-packages\aiogram\dispatcher\dispatcher.py", line 158, in feed_update
+    response = await self.update.wrap_outer_middleware(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<7 lines>...
+    )
+    ^
+  File "C:\Users\G\PycharmProjects\Bot __v.1.7 betta_много_кнопок\.venv\Lib\site-packages\aiogram\dispatcher\middlewares\error.py", line 25, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\G\PycharmProjects\Bot __v.1.7 betta_много_кнопок\.venv\Lib\site-packages\aiogram\dispatcher\middlewares\user_context.py", line 56, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\G\PycharmProjects\Bot __v.1.7 betta_много_кнопок\.venv\Lib\site-packages\aiogram\fsm\middleware.py", line 42, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\G\PycharmProjects\Bot __v.1.7 betta_много_кнопок\.venv\Lib\site-packages\aiogram\dispatcher\event\telegram.py", line 121, in trigger
+    return await wrapped_inner(event, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\G\PycharmProjects\Bot __v.1.7 betta_много_кнопок\.venv\Lib\site-packages\aiogram\dispatcher\event\handler.py", line 43, in call
+    return await wrapped()
+           ^^^^^^^^^^^^^^^
+  File "C:\Users\G\PycharmProjects\Bot __v.1.7 betta_много_кнопок\.venv\Lib\site-packages\aiogram\dispatcher\dispatcher.py", line 276, in _listen_update
+    return await self.propagate_event(update_type=update_type, event=event, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\G\PycharmProjects\Bot __v.1.7 betta_много_кнопок\.venv\Lib\site-packages\aiogram\dispatcher\router.py", line 146, in propagate_event
+    return await observer.wrap_outer_middleware(_wrapped, event=event, data=kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\G\PycharmProjects\Bot __v.1.7 betta_много_кнопок\.venv\Lib\site-packages\aiogram\dispatcher\router.py", line 141, in _wrapped
+    return await self._propagate_event(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        observer=observer, update_type=update_type, event=telegram_event, **data
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\G\PycharmProjects\Bot __v.1.7 betta_много_кнопок\.venv\Lib\site-packages\aiogram\dispatcher\router.py", line 174, in _propagate_event
+    response = await router.propagate_event(update_type=update_type, event=event, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\G\PycharmProjects\Bot __v.1.7 betta_много_кнопок\.venv\Lib\site-packages\aiogram\dispatcher\router.py", line 146, in propagate_event
+    return await observer.wrap_outer_middleware(_wrapped, event=event, data=kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\G\PycharmProjects\Bot __v.1.7 betta_много_кнопок\.venv\Lib\site-packages\aiogram\dispatcher\router.py", line 141, in _wrapped
+    return await self._propagate_event(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        observer=observer, update_type=update_type, event=telegram_event, **data
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\G\PycharmProjects\Bot __v.1.7 betta_много_кнопок\.venv\Lib\site-packages\aiogram\dispatcher\router.py", line 166, in _propagate_event
+    response = await observer.trigger(event, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\G\PycharmProjects\Bot __v.1.7 betta_много_кнопок\.venv\Lib\site-packages\aiogram\dispatcher\event\telegram.py", line 121, in trigger
+    return await wrapped_inner(event, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\G\PycharmProjects\Bot __v.1.7 betta_много_кнопок\.venv\Lib\site-packages\aiogram\dispatcher\event\handler.py", line 43, in call
+    return await wrapped()
+           ^^^^^^^^^^^^^^^
+  File "c:\Users\G\PycharmProjects\Bot __v.1.7 betta_много_кнопок\app\handlers.py", line 426, in storage_info
+    storage_type = type(message.bot.fsm.storage).__name__
+                        ^^^^^^^^^^^^^^^
+AttributeError: 'Bot' object has no attribute 'fsm'
+2025-07-22 00:20:17,543 - aiogram.event - ОШИБКА - Cause exception while process update id=643758102 by bot id=8086321709
+AttributeError: 'Bot' object has no attribute 'fsm'
+Traceback (most recent call last):
+  File "C:\Users\G\PycharmProjects\Bot __v.1.7 betta_много_кнопок\.venv\Lib\site-packages\aiogram\dispatcher\dispatcher.py", line 309, in _process_update
+    response = await self.feed_update(bot, update, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\G\PycharmProjects\Bot __v.1.7 betta_много_кнопок\.venv\Lib\site-packages\aiogram\dispatcher\dispatcher.py", line 158, in feed_update
+    response = await self.update.wrap_outer_middleware(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<7 lines>...
+    )
+    ^
+  File "C:\Users\G\PycharmProjects\Bot __v.1.7 betta_много_кнопок\.venv\Lib\site-packages\aiogram\dispatcher\middlewares\error.py", line 25, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\G\PycharmProjects\Bot __v.1.7 betta_много_кнопок\.venv\Lib\site-packages\aiogram\dispatcher\middlewares\user_context.py", line 56, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\G\PycharmProjects\Bot __v.1.7 betta_много_кнопок\.venv\Lib\site-packages\aiogram\fsm\middleware.py", line 42, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\G\PycharmProjects\Bot __v.1.7 betta_много_кнопок\.venv\Lib\site-packages\aiogram\dispatcher\event\telegram.py", line 121, in trigger
+    return await wrapped_inner(event, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\G\PycharmProjects\Bot __v.1.7 betta_много_кнопок\.venv\Lib\site-packages\aiogram\dispatcher\event\handler.py", line 43, in call
+    return await wrapped()
+           ^^^^^^^^^^^^^^^
+  File "C:\Users\G\PycharmProjects\Bot __v.1.7 betta_много_кнопок\.venv\Lib\site-packages\aiogram\dispatcher\dispatcher.py", line 276, in _listen_update
+    return await self.propagate_event(update_type=update_type, event=event, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\G\PycharmProjects\Bot __v.1.7 betta_много_кнопок\.venv\Lib\site-packages\aiogram\dispatcher\router.py", line 146, in propagate_event
+    return await observer.wrap_outer_middleware(_wrapped, event=event, data=kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\G\PycharmProjects\Bot __v.1.7 betta_много_кнопок\.venv\Lib\site-packages\aiogram\dispatcher\router.py", line 141, in _wrapped
+    return await self._propagate_event(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        observer=observer, update_type=update_type, event=telegram_event, **data
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\G\PycharmProjects\Bot __v.1.7 betta_много_кнопок\.venv\Lib\site-packages\aiogram\dispatcher\router.py", line 174, in _propagate_event
+    response = await router.propagate_event(update_type=update_type, event=event, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\G\PycharmProjects\Bot __v.1.7 betta_много_кнопок\.venv\Lib\site-packages\aiogram\dispatcher\router.py", line 146, in propagate_event
+    return await observer.wrap_outer_middleware(_wrapped, event=event, data=kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\G\PycharmProjects\Bot __v.1.7 betta_много_кнопок\.venv\Lib\site-packages\aiogram\dispatcher\router.py", line 141, in _wrapped
+    return await self._propagate_event(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        observer=observer, update_type=update_type, event=telegram_event, **data
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\G\PycharmProjects\Bot __v.1.7 betta_много_кнопок\.venv\Lib\site-packages\aiogram\dispatcher\router.py", line 166, in _propagate_event
+    response = await observer.trigger(event, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\G\PycharmProjects\Bot __v.1.7 betta_много_кнопок\.venv\Lib\site-packages\aiogram\dispatcher\event\telegram.py", line 121, in trigger
+    return await wrapped_inner(event, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\G\PycharmProjects\Bot __v.1.7 betta_много_кнопок\.venv\Lib\site-packages\aiogram\dispatcher\event\handler.py", line 43, in call
+    return await wrapped()
+           ^^^^^^^^^^^^^^^
+  File "c:\Users\G\PycharmProjects\Bot __v.1.7 betta_много_кнопок\app\handlers.py", line 426, in storage_info
+    storage_type = type(message.bot.fsm.storage).__name__
+                        ^^^^^^^^^^^^^^^
+AttributeError: 'Bot' object has no attribute 'fsm'
+2025-07-22 00:20:21,422 - aiogram.event - ОШИБКА - Cause exception while process update id=643758103 by bot id=8086321709
+AttributeError: 'Bot' object has no attribute 'fsm'
+Traceback (most recent call last):
+  File "C:\Users\G\PycharmProjects\Bot __v.1.7 betta_много_кнопок\.venv\Lib\site-packages\aiogram\dispatcher\dispatcher.py", line 309, in _process_update
+    response = await self.feed_update(bot, update, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\G\PycharmProjects\Bot __v.1.7 betta_много_кнопок\.venv\Lib\site-packages\aiogram\dispatcher\dispatcher.py", line 158, in feed_update
+    response = await self.update.wrap_outer_middleware(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<7 lines>...
+    )
+    ^
+  File "C:\Users\G\PycharmProjects\Bot __v.1.7 betta_много_кнопок\.venv\Lib\site-packages\aiogram\dispatcher\middlewares\error.py", line 25, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\G\PycharmProjects\Bot __v.1.7 betta_много_кнопок\.venv\Lib\site-packages\aiogram\dispatcher\middlewares\user_context.py", line 56, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\G\PycharmProjects\Bot __v.1.7 betta_много_кнопок\.venv\Lib\site-packages\aiogram\fsm\middleware.py", line 42, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\G\PycharmProjects\Bot __v.1.7 betta_много_кнопок\.venv\Lib\site-packages\aiogram\dispatcher\event\telegram.py", line 121, in trigger
+    return await wrapped_inner(event, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\G\PycharmProjects\Bot __v.1.7 betta_много_кнопок\.venv\Lib\site-packages\aiogram\dispatcher\event\handler.py", line 43, in call
+    return await wrapped()
+           ^^^^^^^^^^^^^^^
+  File "C:\Users\G\PycharmProjects\Bot __v.1.7 betta_много_кнопок\.venv\Lib\site-packages\aiogram\dispatcher\dispatcher.py", line 276, in _listen_update
+    return await self.propagate_event(update_type=update_type, event=event, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\G\PycharmProjects\Bot __v.1.7 betta_много_кнопок\.venv\Lib\site-packages\aiogram\dispatcher\router.py", line 146, in propagate_event
+    return await observer.wrap_outer_middleware(_wrapped, event=event, data=kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\G\PycharmProjects\Bot __v.1.7 betta_много_кнопок\.venv\Lib\site-packages\aiogram\dispatcher\router.py", line 141, in _wrapped
+    return await self._propagate_event(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        observer=observer, update_type=update_type, event=telegram_event, **data
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\G\PycharmProjects\Bot __v.1.7 betta_много_кнопок\.venv\Lib\site-packages\aiogram\dispatcher\router.py", line 174, in _propagate_event
+    response = await router.propagate_event(update_type=update_type, event=event, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\G\PycharmProjects\Bot __v.1.7 betta_много_кнопок\.venv\Lib\site-packages\aiogram\dispatcher\router.py", line 146, in propagate_event
+    return await observer.wrap_outer_middleware(_wrapped, event=event, data=kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\G\PycharmProjects\Bot __v.1.7 betta_много_кнопок\.venv\Lib\site-packages\aiogram\dispatcher\router.py", line 141, in _wrapped
+    return await self._propagate_event(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        observer=observer, update_type=update_type, event=telegram_event, **data
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\G\PycharmProjects\Bot __v.1.7 betta_много_кнопок\.venv\Lib\site-packages\aiogram\dispatcher\router.py", line 166, in _propagate_event
+    response = await observer.trigger(event, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\G\PycharmProjects\Bot __v.1.7 betta_много_кнопок\.venv\Lib\site-packages\aiogram\dispatcher\event\telegram.py", line 121, in trigger
+    return await wrapped_inner(event, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\G\PycharmProjects\Bot __v.1.7 betta_много_кнопок\.venv\Lib\site-packages\aiogram\dispatcher\event\handler.py", line 43, in call
+    return await wrapped()
+           ^^^^^^^^^^^^^^^
+  File "c:\Users\G\PycharmProjects\Bot __v.1.7 betta_много_кнопок\app\handlers.py", line 426, in storage_info
+    storage_type = type(message.bot.fsm.storage).__name__
+                        ^^^^^^^^^^^^^^^
+AttributeError: 'Bot' object has no attribute 'fsm'
+2025-07-22 00:20:48,627 - __main__ - ИНФО - 🎯 Запуск главного процесса бота на Windows
+2025-07-22 00:20:48,627 - __main__ - ИНФО - 📄 Файл лога: bot.log
+2025-07-22 00:20:48,638 - app.bot - ИНФО - ✅ Redis подключен успешно
+2025-07-22 00:20:49,265 - app.bot - ИНФО - 🚀 Бот запущен на Windows и готов к работе
+2025-07-22 00:20:49,266 - app.bot - ИНФО - 📄 Файл лога: bot.log
+2025-07-22 00:20:49,408 - app.bot - ИНФО - Админ-панель отправлена в группу -1002392016711
+2025-07-22 00:20:49,408 - app.bot - ИНФО - 📡 Запуск поллинга...
+2025-07-22 00:21:06,018 - aiogram.event - ОШИБКА - Cause exception while process update id=643758104 by bot id=8086321709
+AttributeError: 'Bot' object has no attribute 'fsm'
+Traceback (most recent call last):
+  File "C:\Users\G\PycharmProjects\Bot __v.1.7 betta_много_кнопок\.venv\Lib\site-packages\aiogram\dispatcher\dispatcher.py", line 309, in _process_update
+    response = await self.feed_update(bot, update, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\G\PycharmProjects\Bot __v.1.7 betta_много_кнопок\.venv\Lib\site-packages\aiogram\dispatcher\dispatcher.py", line 158, in feed_update
+    response = await self.update.wrap_outer_middleware(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ...<7 lines>...
+    )
+    ^
+  File "C:\Users\G\PycharmProjects\Bot __v.1.7 betta_много_кнопок\.venv\Lib\site-packages\aiogram\dispatcher\middlewares\error.py", line 25, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\G\PycharmProjects\Bot __v.1.7 betta_много_кнопок\.venv\Lib\site-packages\aiogram\dispatcher\middlewares\user_context.py", line 56, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\G\PycharmProjects\Bot __v.1.7 betta_много_кнопок\.venv\Lib\site-packages\aiogram\fsm\middleware.py", line 42, in __call__
+    return await handler(event, data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\G\PycharmProjects\Bot __v.1.7 betta_много_кнопок\.venv\Lib\site-packages\aiogram\dispatcher\event\telegram.py", line 121, in trigger
+    return await wrapped_inner(event, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\G\PycharmProjects\Bot __v.1.7 betta_много_кнопок\.venv\Lib\site-packages\aiogram\dispatcher\event\handler.py", line 43, in call
+    return await wrapped()
+           ^^^^^^^^^^^^^^^
+  File "C:\Users\G\PycharmProjects\Bot __v.1.7 betta_много_кнопок\.venv\Lib\site-packages\aiogram\dispatcher\dispatcher.py", line 276, in _listen_update
+    return await self.propagate_event(update_type=update_type, event=event, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\G\PycharmProjects\Bot __v.1.7 betta_много_кнопок\.venv\Lib\site-packages\aiogram\dispatcher\router.py", line 146, in propagate_event
+    return await observer.wrap_outer_middleware(_wrapped, event=event, data=kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\G\PycharmProjects\Bot __v.1.7 betta_много_кнопок\.venv\Lib\site-packages\aiogram\dispatcher\router.py", line 141, in _wrapped
+    return await self._propagate_event(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        observer=observer, update_type=update_type, event=telegram_event, **data
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\G\PycharmProjects\Bot __v.1.7 betta_много_кнопок\.venv\Lib\site-packages\aiogram\dispatcher\router.py", line 174, in _propagate_event
+    response = await router.propagate_event(update_type=update_type, event=event, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\G\PycharmProjects\Bot __v.1.7 betta_много_кнопок\.venv\Lib\site-packages\aiogram\dispatcher\router.py", line 146, in propagate_event
+    return await observer.wrap_outer_middleware(_wrapped, event=event, data=kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\G\PycharmProjects\Bot __v.1.7 betta_много_кнопок\.venv\Lib\site-packages\aiogram\dispatcher\router.py", line 141, in _wrapped
+    return await self._propagate_event(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        observer=observer, update_type=update_type, event=telegram_event, **data
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\G\PycharmProjects\Bot __v.1.7 betta_много_кнопок\.venv\Lib\site-packages\aiogram\dispatcher\router.py", line 166, in _propagate_event
+    response = await observer.trigger(event, **kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\G\PycharmProjects\Bot __v.1.7 betta_много_кнопок\.venv\Lib\site-packages\aiogram\dispatcher\event\telegram.py", line 121, in trigger
+    return await wrapped_inner(event, kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\G\PycharmProjects\Bot __v.1.7 betta_много_кнопок\.venv\Lib\site-packages\aiogram\dispatcher\event\handler.py", line 43, in call
+    return await wrapped()
+           ^^^^^^^^^^^^^^^
+  File "c:\Users\G\PycharmProjects\Bot __v.1.7 betta_много_кнопок\app\handlers.py", line 426, in storage_info
+    storage_type = type(message.bot.fsm.storage).__name__
+                        ^^^^^^^^^^^^^^^
+AttributeError: 'Bot' object has no attribute 'fsm'
+2025-07-22 00:25:13,080 - __main__ - ИНФО - 🎯 Запуск главного процесса бота на Windows
+2025-07-22 00:25:13,080 - __main__ - ИНФО - 📄 Файл лога: bot.log
+2025-07-22 00:25:13,089 - app.bot - ИНФО - ✅ Redis подключен успешно
+2025-07-22 00:25:13,888 - app.bot - ИНФО - 🚀 Бот запущен на Windows и готов к работе
+2025-07-22 00:25:13,888 - app.bot - ИНФО - 📄 Файл лога: bot.log
+2025-07-22 00:25:14,072 - app.bot - ИНФО - Админ-панель отправлена в группу -1002392016711
+2025-07-22 00:25:14,073 - app.bot - ИНФО - 📡 Запуск поллинга...
+2025-07-22 00:31:59,906 - __main__ - ИНФО - 🎯 Запуск главного процесса бота на Windows
+2025-07-22 00:31:59,906 - __main__ - ИНФО - 📄 Файл лога: bot.log
+2025-07-22 00:31:59,916 - app.bot - ИНФО - ✅ Redis подключен успешно
+2025-07-22 00:32:00,599 - app.bot - ИНФО - 🚀 Бот запущен на Windows и готов к работе
+2025-07-22 00:32:00,600 - app.bot - ИНФО - 📄 Файл лога: bot.log
+2025-07-22 00:32:00,743 - app.bot - ИНФО - Админ-панель отправлена в группу -1002392016711
+2025-07-22 00:32:00,744 - app.bot - ИНФО - 📡 Запуск поллинга...
+2025-07-22 00:32:16,596 - app.handlers - ИНФО - 👤 Пользователь Игнат (ID: 1602581828) начал регистрацию
+2025-07-22 00:32:19,374 - app.handlers - ИНФО - 📍 Пользователь Игнат ввел адрес: Сдабсьп
+2025-07-22 00:32:31,179 - app.handlers - ИНФО - 📸 Первое фото сохранено: c:\Users\G\PycharmProjects\Bot __v.1.7 betta_много_кнопок\app\photos\acf74768-b463-4837-b069-49dd8b9ef4aa.jpg
+2025-07-22 00:32:55,479 - __main__ - ИНФО - 🎯 Запуск главного процесса бота на Windows
+2025-07-22 00:32:55,479 - __main__ - ИНФО - 📄 Файл лога: bot.log
+2025-07-22 00:32:55,489 - app.bot - ИНФО - ✅ Redis подключен успешно
+2025-07-22 00:32:56,255 - app.bot - ИНФО - 🚀 Бот запущен на Windows и готов к работе
+2025-07-22 00:32:56,256 - app.bot - ИНФО - 📄 Файл лога: bot.log
+2025-07-22 00:32:56,461 - app.bot - ИНФО - Админ-панель отправлена в группу -1002392016711
+2025-07-22 00:32:56,462 - app.bot - ИНФО - 📡 Запуск поллинга...
+2025-07-22 00:33:02,758 - app.handlers - ИНФО - 📸 Второе фото сохранено: c:\Users\G\PycharmProjects\Bot __v.1.7 betta_много_кнопок\app\photos\740e9f46-d525-4c2f-a8be-50f364c38925.jpg
+2025-07-22 00:33:07,121 - app.database - ИНФО - Заявка 8033 сохранена в БД с фото: c:\Users\G\PycharmProjects\Bot __v.1.7 betta_много_кнопок\app\photos\acf74768-b463-4837-b069-49dd8b9ef4aa.jpg;c:\Users\G\PycharmProjects\Bot __v.1.7 betta_много_кнопок\app\photos\740e9f46-d525-4c2f-a8be-50f364c38925.jpg;c:\Users\G\PycharmProjects\Bot __v.1.7 betta_много_кнопок\app\photos\28fa0932-a5c3-46b7-b10f-4d877c6389ef.jpg
+2025-07-22 00:33:07,211 - app.handlers - ИНФО - 📝 Заявка от Игнат создана с адресом: Сдабсьп
+2025-07-22 00:33:07,211 - app.handlers - ИНФО - 📸 Все фото сохранены: c:\Users\G\PycharmProjects\Bot __v.1.7 betta_много_кнопок\app\photos\acf74768-b463-4837-b069-49dd8b9ef4aa.jpg, c:\Users\G\PycharmProjects\Bot __v.1.7 betta_много_кнопок\app\photos\740e9f46-d525-4c2f-a8be-50f364c38925.jpg, c:\Users\G\PycharmProjects\Bot __v.1.7 betta_много_кнопок\app\photos\28fa0932-a5c3-46b7-b10f-4d877c6389ef.jpg
+2025-07-22 00:42:50,572 - __main__ - ИНФО - 🎯 Запуск главного процесса бота на Windows
+2025-07-22 00:42:50,573 - __main__ - ИНФО - 📄 Файл лога: bot.log
+2025-07-22 00:42:50,583 - app.bot - ИНФО - ✅ Redis подключен успешно
+2025-07-22 00:42:51,278 - app.bot - ИНФО - 🚀 Бот запущен на Windows и готов к работе
+2025-07-22 00:42:51,279 - app.bot - ИНФО - 📄 Файл лога: bot.log
+2025-07-22 00:42:51,409 - app.bot - ИНФО - Админ-панель отправлена в группу -1002392016711
+2025-07-22 00:42:51,409 - app.bot - ИНФО - 📡 Запуск поллинга...
+2025-07-22 00:43:12,302 - app.handlers - ИНФО - 👤 Пользователь Игнат (ID: 1602581828) начал регистрацию
+2025-07-22 00:43:16,544 - app.handlers - ПРЕДУПРЕЖДЕНИЕ - Заявка с ID 8033 не найдена в хранилище
+2025-07-22 00:43:25,253 - app.handlers - ИНФО - 📍 Пользователь Игнат ввел адрес: Рчоаосоа
+2025-07-22 00:43:29,206 - app.handlers - ИНФО - 📸 Первое фото сохранено: c:\Users\G\PycharmProjects\Bot __v.1.7 betta_много_кнопок\app\photos\b5a1235e-0a47-4f0c-8890-881ee52ea1f9.jpg
+2025-07-22 00:43:31,830 - app.handlers - ИНФО - 📸 Второе фото сохранено: c:\Users\G\PycharmProjects\Bot __v.1.7 betta_много_кнопок\app\photos\393acba9-533f-4af6-a363-95375e2e3b22.jpg
+2025-07-22 00:43:34,656 - app.database - ИНФО - Заявка 8039 сохранена в БД с фото: c:\Users\G\PycharmProjects\Bot __v.1.7 betta_много_кнопок\app\photos\b5a1235e-0a47-4f0c-8890-881ee52ea1f9.jpg;c:\Users\G\PycharmProjects\Bot __v.1.7 betta_много_кнопок\app\photos\393acba9-533f-4af6-a363-95375e2e3b22.jpg;c:\Users\G\PycharmProjects\Bot __v.1.7 betta_много_кнопок\app\photos\334b4942-36cd-44c8-a5ef-773236b94dcf.jpg
+2025-07-22 00:43:34,784 - app.handlers - ИНФО - 📝 Заявка от Игнат создана с адресом: Рчоаосоа
+2025-07-22 00:43:34,784 - app.handlers - ИНФО - 📸 Все фото сохранены: c:\Users\G\PycharmProjects\Bot __v.1.7 betta_много_кнопок\app\photos\b5a1235e-0a47-4f0c-8890-881ee52ea1f9.jpg, c:\Users\G\PycharmProjects\Bot __v.1.7 betta_много_кнопок\app\photos\393acba9-533f-4af6-a363-95375e2e3b22.jpg, c:\Users\G\PycharmProjects\Bot __v.1.7 betta_много_кнопок\app\photos\334b4942-36cd-44c8-a5ef-773236b94dcf.jpg
+2025-07-22 00:44:37,368 - app.handlers - ИНФО - 👤 Пользователь SMK (ID: 1227251210) начал регистрацию
+2025-07-22 00:44:41,803 - app.handlers - ИНФО - 📍 Пользователь SMK ввел адрес: Норка
+2025-07-22 00:44:47,557 - app.handlers - ИНФО - 📸 Первое фото сохранено: c:\Users\G\PycharmProjects\Bot __v.1.7 betta_много_кнопок\app\photos\0b1cba1e-40ea-40f5-9c48-1d5d36c84042.jpg
+2025-07-22 00:44:51,885 - app.handlers - ИНФО - 📸 Второе фото сохранено: c:\Users\G\PycharmProjects\Bot __v.1.7 betta_много_кнопок\app\photos\34724c07-439f-4222-b4fb-359ffebd1766.jpg
+2025-07-22 00:44:56,597 - app.database - ИНФО - Заявка 8047 сохранена в БД с фото: c:\Users\G\PycharmProjects\Bot __v.1.7 betta_много_кнопок\app\photos\0b1cba1e-40ea-40f5-9c48-1d5d36c84042.jpg;c:\Users\G\PycharmProjects\Bot __v.1.7 betta_много_кнопок\app\photos\34724c07-439f-4222-b4fb-359ffebd1766.jpg;c:\Users\G\PycharmProjects\Bot __v.1.7 betta_много_кнопок\app\photos\d5cb8f32-7c9b-442b-b3f8-571cf02aaf77.jpg
+2025-07-22 00:44:56,706 - app.handlers - ИНФО - 📝 Заявка от SMK создана с адресом: Норка
+2025-07-22 00:44:56,707 - app.handlers - ИНФО - 📸 Все фото сохранены: c:\Users\G\PycharmProjects\Bot __v.1.7 betta_много_кнопок\app\photos\0b1cba1e-40ea-40f5-9c48-1d5d36c84042.jpg, c:\Users\G\PycharmProjects\Bot __v.1.7 betta_много_кнопок\app\photos\34724c07-439f-4222-b4fb-359ffebd1766.jpg, c:\Users\G\PycharmProjects\Bot __v.1.7 betta_много_кнопок\app\photos\d5cb8f32-7c9b-442b-b3f8-571cf02aaf77.jpg
+2025-07-22 00:54:01,478 - __main__ - ИНФО - 🎯 Запуск главного процесса бота на Windows
+2025-07-22 00:54:01,479 - __main__ - ИНФО - 📄 Файл лога: bot.log
+2025-07-22 00:54:01,492 - app.bot - ИНФО - ✅ Redis подключен успешно
+2025-07-22 00:54:02,284 - app.bot - ИНФО - 🚀 Бот запущен на Windows и готов к работе
+2025-07-22 00:54:02,284 - app.bot - ИНФО - 📄 Файл лога: bot.log
+2025-07-22 00:54:02,433 - app.bot - ИНФО - Админ-панель отправлена в группу -1002392016711
+2025-07-22 00:54:02,433 - app.bot - ИНФО - 📡 Запуск поллинга...
+2025-07-22 00:54:07,029 - app.handlers - ПРЕДУПРЕЖДЕНИЕ - Заявка с ID 8047 не найдена в хранилище
+2025-07-22 00:54:35,175 - app.handlers - ИНФО - 👤 Пользователь Игнат (ID: 1602581828) начал регистрацию
+2025-07-22 00:54:42,213 - app.handlers - ИНФО - 📍 Пользователь Игнат ввел адрес: None
+2025-07-22 00:54:47,495 - app.handlers - ИНФО - 📸 Первое фото сохранено: c:\Users\G\PycharmProjects\Bot __v.1.7 betta_много_кнопок\app\photos\a3790433-2cde-4cc7-b1c6-73f45c905c6b.jpg
+2025-07-22 00:54:51,305 - app.handlers - ИНФО - 📸 Второе фото сохранено: c:\Users\G\PycharmProjects\Bot __v.1.7 betta_много_кнопок\app\photos\28e39ffe-a38c-4c05-a3c4-6e1163f66573.jpg
+2025-07-22 00:54:53,634 - app.handlers - ОШИБКА - Ошибка при отправке данных: Не все данные получены
+Traceback (most recent call last):
+  File "c:\Users\G\PycharmProjects\Bot __v.1.7 betta_много_кнопок\app\handlers.py", line 1319, in save_adres
+    raise ValueError("Не все данные получены")
+ValueError: Не все данные получены
+2025-07-22 00:54:55,528 - app.handlers - ИНФО - 👤 Пользователь Игнат (ID: 1602581828) начал регистрацию
+2025-07-22 00:54:58,485 - app.handlers - ИНФО - 📍 Пользователь Игнат ввел адрес: Алалпла
+2025-07-22 00:55:03,048 - app.handlers - ИНФО - 📸 Первое фото сохранено: c:\Users\G\PycharmProjects\Bot __v.1.7 betta_много_кнопок\app\photos\1e09d64c-efbd-4f86-9d4b-03e6f6b536da.jpg
+2025-07-22 00:55:07,231 - app.handlers - ИНФО - 📸 Второе фото сохранено: c:\Users\G\PycharmProjects\Bot __v.1.7 betta_много_кнопок\app\photos\1fec6a9f-d777-4464-b8a4-25f643be902f.jpg
+2025-07-22 00:55:10,465 - app.database - ИНФО - Заявка 8058 сохранена в БД с фото: c:\Users\G\PycharmProjects\Bot __v.1.7 betta_много_кнопок\app\photos\1e09d64c-efbd-4f86-9d4b-03e6f6b536da.jpg;c:\Users\G\PycharmProjects\Bot __v.1.7 betta_много_кнопок\app\photos\1fec6a9f-d777-4464-b8a4-25f643be902f.jpg;c:\Users\G\PycharmProjects\Bot __v.1.7 betta_много_кнопок\app\photos\c46e93a3-9314-43b2-9b00-a805b6e57411.jpg
+2025-07-22 00:55:10,571 - app.handlers - ИНФО - 📝 Заявка от Игнат создана с адресом: Алалпла
+2025-07-22 00:55:10,571 - app.handlers - ИНФО - 📸 Все фото сохранены: c:\Users\G\PycharmProjects\Bot __v.1.7 betta_много_кнопок\app\photos\1e09d64c-efbd-4f86-9d4b-03e6f6b536da.jpg, c:\Users\G\PycharmProjects\Bot __v.1.7 betta_много_кнопок\app\photos\1fec6a9f-d777-4464-b8a4-25f643be902f.jpg, c:\Users\G\PycharmProjects\Bot __v.1.7 betta_много_кнопок\app\photos\c46e93a3-9314-43b2-9b00-a805b6e57411.jpg
+2025-07-22 01:01:00,141 - app.handlers - ИНФО - 👤 Пользователь SMK (ID: 1227251210) начал регистрацию
+2025-07-22 01:01:05,719 - app.handlers - ИНФО - 📍 Пользователь SMK ввел адрес: Роо
+2025-07-22 01:01:15,348 - app.handlers - ИНФО - 📸 Первое фото сохранено: c:\Users\G\PycharmProjects\Bot __v.1.7 betta_много_кнопок\app\photos\ef5ad32e-a2c4-43b0-85d5-2fe82f79f1c9.jpg
+2025-07-22 01:01:18,480 - app.handlers - ИНФО - 📸 Второе фото сохранено: c:\Users\G\PycharmProjects\Bot __v.1.7 betta_много_кнопок\app\photos\0f902b07-8ce3-43f5-901b-8722792a745c.jpg
+2025-07-22 01:01:22,202 - app.database - ИНФО - Заявка 8064 сохранена в БД с фото: c:\Users\G\PycharmProjects\Bot __v.1.7 betta_много_кнопок\app\photos\ef5ad32e-a2c4-43b0-85d5-2fe82f79f1c9.jpg;c:\Users\G\PycharmProjects\Bot __v.1.7 betta_много_кнопок\app\photos\0f902b07-8ce3-43f5-901b-8722792a745c.jpg;c:\Users\G\PycharmProjects\Bot __v.1.7 betta_много_кнопок\app\photos\26fb6425-b725-4527-ab9f-7f7381bedd31.jpg
+2025-07-22 01:01:22,316 - app.handlers - ИНФО - 📝 Заявка от SMK создана с адресом: Роо
+2025-07-22 01:01:22,316 - app.handlers - ИНФО - 📸 Все фото сохранены: c:\Users\G\PycharmProjects\Bot __v.1.7 betta_много_кнопок\app\photos\ef5ad32e-a2c4-43b0-85d5-2fe82f79f1c9.jpg, c:\Users\G\PycharmProjects\Bot __v.1.7 betta_много_кнопок\app\photos\0f902b07-8ce3-43f5-901b-8722792a745c.jpg, c:\Users\G\PycharmProjects\Bot __v.1.7 betta_много_кнопок\app\photos\26fb6425-b725-4527-ab9f-7f7381bedd31.jpg

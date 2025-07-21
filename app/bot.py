@@ -9,6 +9,8 @@ from app.handlers import router  # импортируем роутер из hand
 from app.config import TOKEN, GROUP_ID, ADMINS
 from aiogram.types import BotCommand, BotCommandScopeAllGroupChats
 from aiogram.fsm.storage.memory import MemoryStorage
+from aiogram.fsm.storage.redis import RedisStorage
+
 import app.keyboards as kb
 
 # Определяем путь к файлу лога в зависимости от операционной системы
@@ -112,10 +114,27 @@ async def on_shutdown(bot, dp):
     
     logger.info("✅ Бот полностью остановлен")
 
+
+async def create_redis_storage():
+    """Создание Redis хранилища с fallback на Memory"""
+    try:
+        # Используем redis.asyncio вместо aioredis
+        import redis.asyncio as redis
+        redis_client = redis.Redis.from_url("redis://localhost:6379", decode_responses=True)
+        await redis_client.ping()  # Проверяем соединение
+        logger.info("✅ Redis подключен успешно")
+        return RedisStorage(redis=redis_client)
+    except Exception as e:
+        logger.warning(f"⚠️ Redis недоступен ({str(e)}), используем MemoryStorage")
+        return MemoryStorage()
+
+
+
 async def main():
     """Основная функция запуска бота"""
     # Инициализация хранилища состояний
-    storage = MemoryStorage()
+# Инициализация хранилища состояний
+    storage = await create_redis_storage()
     
     # Инициализация бота с токеном из конфигурации
     bot = Bot(token=TOKEN)

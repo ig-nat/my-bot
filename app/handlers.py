@@ -112,7 +112,8 @@ async def safe_send_media_group(bot, chat_id, media, **kwargs):
 
 
 class Reg(StatesGroup):
-    adres = State()
+    city = State()      # ← НОВЫЙ ШАГ
+    adres = State()     # ← ОСТАЕТСЯ
     photo = State()
     photo2 = State()
     photo3 = State()
@@ -136,12 +137,14 @@ class CancelRegistrationState(StatesGroup):
     waiting_for_reason = State()
 # Добавить после существующих классов состояний (после class CancelRegistrationState)
 class OpsReplacement(StatesGroup):
+    city = State()      # ← НОВОЕ ПОЛЕ
     adres = State()
     ops_photo = State()
     screen_photo = State()
     final_photo = State()
 
 class TvReplacement(StatesGroup):
+    city = State()      # ← НОВОЕ ПОЛЕ
     adres = State()
     tv_photo = State()
     final_photo = State()
@@ -415,6 +418,32 @@ async def admin_panel(message: Message):
         return
     
     await message.answer("👨‍💼 Панель администратора", reply_markup=kb.admin_kb)
+
+
+@router.message(Command("storage_info"))
+async def storage_info(message: Message, state: FSMContext):
+    if message.from_user.id not in ADMINS:
+        return
+    
+    # Получаем тип хранилища из state
+    storage_type = type(state.storage).__name__
+    
+    if "Redis" in storage_type:
+        status = "✅ Redis активен - состояния сохраняются при перезагрузке"
+        try:
+            # Дополнительная проверка Redis
+            if hasattr(state.storage, 'redis'):
+                redis_info = await state.storage.redis.info()
+                uptime = redis_info.get('uptime_in_seconds', 0)
+                status += f"\n⏱️ Redis работает: {uptime} секунд"
+        except Exception as e:
+            status += f"\n⚠️ Проблемы с подключением к Redis: {str(e)}"
+    else:
+        status = "⚠️ Memory Storage - состояния НЕ сохраняются при перезагрузке"
+    
+    await message.answer(f"🗄️ Тип хранилища: {storage_type}\n{status}")
+
+
 
 # Обработчик для кнопки "Вернуться"
 @router.message(F.text == "🔙 Вернуться")
@@ -745,12 +774,24 @@ async def refresh_button(message: Message, state: FSMContext):
 
 @router.message(F.text == 'регистрация экрана')
 async def start_registration(message: Message, state: FSMContext):
-    # Добавь эту строку в самое начало функции
-    if message.chat.type != 'private':
-        return
     logger.info(f"👤 Пользователь {message.from_user.full_name} (ID: {message.from_user.id}) начал регистрацию")
-    await state.set_state(Reg.adres)
-    await message.answer("📍 Введите адрес ПВЗ:", reply_markup=kb.cancel_kb)
+    await state.set_state(Reg.city)  # ← ИЗМЕНИЛИ: было Reg.adres
+    await message.answer("🏙️ Укажите город:", reply_markup=kb.cancel_kb)  # ← ИЗМЕНИЛИ: было "адрес"
+
+# НОВЫЙ: Обработчик города для обычной регистрации
+@router.message(Reg.city)
+async def save_city(message: Message, state: FSMContext):
+    if message.text == "❌ Отмена":
+        logger.info(f"❌ Пользователь {message.from_user.full_name} отменил регистрацию на этапе ввода города")
+        await state.clear()
+        await message.answer("❎ Регистрация отменена", reply_markup=kb.main)
+        return
+
+    logger.info(f"🏙️ Пользователь {message.from_user.full_name} ввел город: {message.text}")
+    await state.update_data(city=message.text)
+    await state.set_state(Reg.adres)  # ← ПЕРЕХОДИМ К АДРЕСУ
+    await message.answer("✅ Город сохранён! Теперь введите адрес ПВЗ:", reply_markup=kb.cancel_kb)
+
 
 @router.message(F.text == 'замена оборудования')
 async def start_replacement(message: Message, state: FSMContext):
@@ -763,22 +804,45 @@ async def start_replacement(message: Message, state: FSMContext):
 
 @router.message(F.text == 'замена OPS')
 async def start_ops_replacement(message: Message, state: FSMContext):
-    # Добавь эту строку
-    if message.chat.type != 'private':
+    logger.info(f"👤 Пользователь {message.from_user.full_name} выбрал замену OPS")
+    await state.set_state(OpsReplacement.city)  # ← ИЗМЕНИЛИ: было OpsReplacement.adres
+    await message.answer("🏙️ Укажите город:", reply_markup=kb.cancel_kb)  # ← ИЗМЕНИЛИ: было "адрес"
+
+
+# НОВЫЙ: Обработчик города для замены OPS
+@router.message(OpsReplacement.city)
+async def save_ops_city(message: Message, state: FSMContext):
+    if message.text == "❌ Отмена":
+        await state.clear()
+        await message.answer("❎ Замена оборудования отменена", reply_markup=kb.main)
         return
 
-    logger.info(f"👤 Пользователь {message.from_user.full_name} выбрал замену OPS")
-    await state.set_state(OpsReplacement.adres)
-    await message.answer("📍 Введите адрес ремонта:", reply_markup=kb.cancel_kb)
+    logger.info(f"🏙️ Пользователь {message.from_user.full_name} ввел город для замены OPS: {message.text}")
+    await state.update_data(city=message.text)
+    await state.set_state(OpsReplacement.adres)  # ← ПЕРЕХОДИМ К АДРЕСУ
+    await message.answer("✅ Город сохранён! Теперь введите адрес ремонта:", reply_markup=kb.cancel_kb)
+
 
 @router.message(F.text == 'замена Телевизора')
 async def start_tv_replacement(message: Message, state: FSMContext):
-    # Добавь эту строку
-    if message.chat.type != 'private':
-        return
     logger.info(f"👤 Пользователь {message.from_user.full_name} выбрал замену телевизора")
-    await state.set_state(TvReplacement.adres)
-    await message.answer("📍 Введите адрес ремонта:", reply_markup=kb.cancel_kb)
+    await state.set_state(TvReplacement.city)  # ← ИЗМЕНИЛИ: было TvReplacement.adres
+    await message.answer("🏙️ Укажите город:", reply_markup=kb.cancel_kb)  # ← ИЗМЕНИЛИ: было "адрес"
+
+
+# НОВЫЙ: Обработчик города для замены TV
+@router.message(TvReplacement.city)
+async def save_tv_city(message: Message, state: FSMContext):
+    if message.text == "❌ Отмена":
+        await state.clear()
+        await message.answer("❎ Замена оборудования отменена", reply_markup=kb.main)
+        return
+
+    logger.info(f"🏙️ Пользователь {message.from_user.full_name} ввел город для замены TV: {message.text}")
+    await state.update_data(city=message.text)
+    await state.set_state(TvReplacement.adres)  # ← ПЕРЕХОДИМ К АДРЕСУ
+    await message.answer("✅ Город сохранён! Теперь введите адрес ремонта:", reply_markup=kb.cancel_kb)
+
 
 # Обработчики для замены OPS
 @router.message(OpsReplacement.adres)
@@ -1743,17 +1807,24 @@ async def handle_gid(message: Message, state: FSMContext):
         
         # Обновляем клавиатуру
         connection_buttons = InlineKeyboardMarkup(
-            inline_keyboard=[
-                [
-                    InlineKeyboardButton(text="——— ПРОБЛЕМЫ СО СВЯЗЬЮ ———", callback_data="ignore")
-                ],
-                [
-                    InlineKeyboardButton(text="🔴 НЕТ СВЯЗИ", callback_data="no_connection"),
-                    InlineKeyboardButton(text="⚠️ ПЛОХАЯ СВЯЗЬ", callback_data="bad_connection"),
-                    InlineKeyboardButton(text="🔄 СМЕНА ПОРТА", callback_data="change_port")
-                ]
-            ]
-        )
+    inline_keyboard=[
+        [
+            InlineKeyboardButton(text="——— ПРОБЛЕМЫ СО СВЯЗЬЮ ———", callback_data="ignore")
+        ],
+        [
+            InlineKeyboardButton(text="🔴 НЕТ СВЯЗИ", callback_data="no_connection"),
+            InlineKeyboardButton(text="⚠️ ПЛОХАЯ СВЯЗЬ", callback_data="bad_connection")
+        ],
+        [
+            InlineKeyboardButton(text="🔄 СМЕНА ПОРТА", callback_data="change_port"),
+            InlineKeyboardButton(text="🔌 ПЕРЕЗАГРУЗИ ТВ", callback_data="restart_tv")
+        ],
+        [
+            InlineKeyboardButton(text="💬 СВЯЗЬ С МОНТАЖНИКОМ", callback_data="contact_user")
+        ]
+    ]
+)
+
         
         try:
             button_message_id = storage_data.get("button_message_id")
@@ -1803,17 +1874,24 @@ async def accept_registration(callback: CallbackQuery, state: FSMContext):
         try:
             # Обновляем клавиатуру, оставляя только кнопки проблем со связью
             connection_buttons = InlineKeyboardMarkup(
-                inline_keyboard=[
-                    [
-                        InlineKeyboardButton(text="——— ПРОБЛЕМЫ СО СВЯЗЬЮ ———", callback_data="ignore")
-                    ],
-                    [
-                        InlineKeyboardButton(text="🔴 НЕТ СВЯЗИ", callback_data="no_connection"),
-                        InlineKeyboardButton(text="⚠️ ПЛОХАЯ СВЯЗЬ", callback_data="bad_connection"),
-                        InlineKeyboardButton(text="🔄 СМЕНА ПОРТА", callback_data="change_port")
-                    ]
-                ]
-            )
+    inline_keyboard=[
+        [
+            InlineKeyboardButton(text="——— ПРОБЛЕМЫ СО СВЯЗЬЮ ———", callback_data="ignore")
+        ],
+        [
+            InlineKeyboardButton(text="🔴 НЕТ СВЯЗИ", callback_data="no_connection"),
+            InlineKeyboardButton(text="⚠️ ПЛОХАЯ СВЯЗЬ", callback_data="bad_connection")
+        ],
+        [
+            InlineKeyboardButton(text="🔄 СМЕНА ПОРТА", callback_data="change_port"),
+            InlineKeyboardButton(text="🔌 ПЕРЕЗАГРУЗИ ТВ", callback_data="restart_tv")
+        ],
+        [
+            InlineKeyboardButton(text="💬 СВЯЗЬ С МОНТАЖНИКОМ", callback_data="contact_user")
+        ]
+    ]
+)
+
             
             # Используем безопасное редактирование клавиатуры
             success = await safe_edit_reply_markup(
@@ -1971,34 +2049,50 @@ async def accept_final_photo(callback: CallbackQuery, state: FSMContext):
             raise ValueError("Не удалось получить user_id из хранилища")
 
         group_message_id = storage_data.get("group_message_id")
+        user_name = storage_data.get("user_name", "Неизвестный")
+        adres = storage_data.get("adres", "")
+        gid = storage_data.get("gid", "")
+        replacement_type = storage_data.get("replacement_type", "")
         
-        # Помечаем заявку как завершенную в storage с временной меткой
-        storage[final_message_id]["is_completed"] = True
-        storage[final_message_id]["completed_at"] = datetime.datetime.now()
+        # НОВОЕ: Отправляем сообщение с подписью модератора
+        moderator_name = callback.from_user.full_name
         
-        # ИСПРАВЛЕНИЕ: используем правильный request_id для обновления в базе
-        if group_message_id:
-            # Обновляем статус в базе данных по group_message_id
-            db.update_request_status(
-                str(group_message_id),  # Используем group_message_id вместо final_message_id
-                "completed", 
-                callback.from_user.full_name
-            )
-            
-            # Также помечаем основную заявку как завершенную
-            if group_message_id in storage:
-                storage[group_message_id]["is_completed"] = True
-                storage[group_message_id]["completed_at"] = datetime.datetime.now()
+        # Формируем текст в зависимости от типа заявки
+        if replacement_type == "OPS":
+            signature_text = f"🔧 ЗАМЕНА OPS - ✅ ПРИНЯТО\n"
+        elif replacement_type == "TV":
+            signature_text = f"📺 ЗАМЕНА ТЕЛЕВИЗОРА - ✅ ПРИНЯТО\n"
         else:
-            # Если нет group_message_id, используем final_message_id
-            db.update_request_status(
-                str(final_message_id), 
-                "completed", 
-                callback.from_user.full_name
-            )
+            signature_text = f"📺 РЕГИСТРАЦИЯ ЭКРАНА - ✅ ПРИНЯТО\n"
+        
+        signature_text += f"👤 Принял: {moderator_name}\n"
+        signature_text += f"🏠 Адрес: {adres}\n"
+        if gid:
+            signature_text += f"🆔 GiD: {gid}\n"
+        signature_text += f"📅 Время: {datetime.datetime.now().strftime('%d.%m.%Y %H:%M')}"
+        
+        # Отправляем подпись в GROUP_ID_3
+        await send_message_with_retry(
+            callback.bot,
+            chat_id=GROUP_ID_3,
+            text=signature_text,
+            reply_to_message_id=final_message_id
+        )
+        
+        # Помечаем заявку как завершенную
+        storage[final_message_id]["is_completed"] = True
+        storage[final_message_id]["moderator_name"] = moderator_name
+        db.update_request_status(
+            str(final_message_id), 
+            "completed", 
+            moderator_name
+        )
 
-        # Удаляем сообщение с кнопками в основной группе
         if group_message_id and group_message_id in storage:
+            storage[group_message_id]["is_completed"] = True
+            storage[group_message_id]["moderator_name"] = moderator_name
+            
+            # Пытаемся удалить сообщение с кнопками в основной группе
             try:
                 await safe_delete_message(
                     callback.bot,
@@ -2016,10 +2110,16 @@ async def accept_final_photo(callback: CallbackQuery, state: FSMContext):
         )
 
         # Уведомляем пользователя об успешном завершении
+        success_message = "🎉 Регистрация успешно завершена!"
+        if replacement_type == "OPS":
+            success_message = "🎉 Замена OPS успешно завершена!"
+        elif replacement_type == "TV":
+            success_message = "🎉 Замена телевизора успешно завершена!"
+            
         await send_message_with_retry(
             callback.bot,
             chat_id=user_id,
-            text="🎉 Регистрация успешно завершена!",
+            text=success_message,
             reply_markup=kb.main
         )
 
@@ -2031,16 +2131,14 @@ async def accept_final_photo(callback: CallbackQuery, state: FSMContext):
         await user_state.clear()
 
         # Логируем успешное завершение
-        logger.info(f"Заявка {final_message_id} (основная: {group_message_id}) успешно завершена для пользователя {user_id}")
-        
-        # Запускаем очистку завершённых заявок
-        await cleanup_completed_requests()
+        logger.info(f"Заявка {final_message_id} принята модератором {moderator_name}")
         
         await callback.answer("✅ Заявка принята")
 
     except Exception as e:
         logger.error(f"Ошибка при принятии финального фото: {str(e)}", exc_info=True)
         await callback.answer("❌ Ошибка при принятии заявки.")
+
 
 
 
@@ -2234,6 +2332,10 @@ async def reject_final_photo(callback: CallbackQuery, state: FSMContext):
         if not user_id:
             raise ValueError("Не удалось получить user_id из хранилища")
 
+        # НОВОЕ: Сохраняем информацию о модераторе для последующего использования
+        moderator_name = callback.from_user.full_name
+        storage[final_message_id]["moderator_name"] = moderator_name
+
         # Удаляем сообщение с кнопками
         await safe_delete_message(
             callback.bot,
@@ -2242,7 +2344,11 @@ async def reject_final_photo(callback: CallbackQuery, state: FSMContext):
         )
 
         await state.set_state(Moderator2State.waiting_for_reject_reason)
-        await state.update_data(final_message_id=final_message_id, user_id=user_id)
+        await state.update_data(
+            final_message_id=final_message_id, 
+            user_id=user_id,
+            moderator_name=moderator_name  # Сохраняем имя модератора
+        )
 
         await callback.message.answer("📝 Укажите причину отказа:")
         await callback.answer()
@@ -2252,21 +2358,56 @@ async def reject_final_photo(callback: CallbackQuery, state: FSMContext):
         await callback.answer("❌ Ошибка при отклонении заявки.")
 
 
+
 @router.message(F.chat.id == GROUP_ID_3, Moderator2State.waiting_for_reject_reason)
 async def handle_reject_reason(message: Message, state: FSMContext):
     try:
         data = await state.get_data()
         final_message_id = data.get("final_message_id")
         user_id = data.get("user_id")
+        moderator_name = data.get("moderator_name", message.from_user.full_name)
 
         if not final_message_id or not user_id:
             raise ValueError("Не удалось получить данные из состояния")
 
+        # Получаем информацию о заявке
+        storage_data = storage.get(final_message_id, {})
+        user_name = storage_data.get("user_name", "Неизвестный")
+        adres = storage_data.get("adres", "")
+        gid = storage_data.get("gid", "")
+        replacement_type = storage_data.get("replacement_type", "")
+
+        # НОВОЕ: Отправляем сообщение с подписью модератора и причиной отказа
+        # Формируем текст в зависимости от типа заявки
+        if replacement_type == "OPS":
+            signature_text = f"🔧 ЗАМЕНА OPS - ❌ ОТКЛОНЕНО\n"
+        elif replacement_type == "TV":
+            signature_text = f"📺 ЗАМЕНА ТЕЛЕВИЗОРА - ❌ ОТКЛОНЕНО\n"
+        else:
+            signature_text = f"📺 РЕГИСТРАЦИЯ ЭКРАНА - ❌ ОТКЛОНЕНО\n"
+        
+        signature_text += f"👤 Отклонил: {moderator_name}\n"
+        signature_text += f"🏠 Адрес: {adres}\n"
+        if gid:
+            signature_text += f"🆔 GiD: {gid}\n"
+        signature_text += f"📝 Причина: {message.text}\n"
+        signature_text += f"📅 Время: {datetime.datetime.now().strftime('%d.%m.%Y %H:%M')}"
+        
+        # Отправляем подпись в GROUP_ID_3
+        await send_message_with_retry(
+            message.bot,
+            chat_id=GROUP_ID_3,
+            text=signature_text,
+            reply_to_message_id=final_message_id
+        )
+
         # Отправляем сообщение пользователю с причиной отказа
+        reject_message = f"❌ Ваше финальное фото отклонено. Причина: {message.text}\nПожалуйста, отправьте новое финальное фото."
+        
         await send_message_with_retry(
             message.bot,
             chat_id=user_id,
-            text=f"❌ Ваше финальное фото отклонено. Причина: {message.text}\nПожалуйста, отправьте новое финальное фото.",
+            text=reject_message,
             reply_markup=kb.cancel_kb
         )
 
@@ -2277,13 +2418,18 @@ async def handle_reject_reason(message: Message, state: FSMContext):
         )
         await user_state.update_data(final_photo_sent=False)
 
-        await message.answer("✅ Причина отказа отправлена пользователю.")
+        await message.answer(f"✅ Причина отказа отправлена пользователю.\nОтклонил: {moderator_name}")
+        
+        # Логируем отклонение
+        logger.info(f"Заявка {final_message_id} отклонена модератором {moderator_name}, причина: {message.text}")
+        
         await state.clear()
 
     except Exception as e:
         logger.error(f"Ошибка: {str(e)}", exc_info=True)
         await message.answer("❌ Ошибка отправки причины отказа.")
         await state.clear()
+
 
 
 @router.callback_query(F.data == "bad_connection")
@@ -2777,6 +2923,49 @@ async def ignore_callback(callback: CallbackQuery):
     await callback.answer()
 
 
+@router.callback_query(F.data == "contact_user")
+async def contact_user(callback: CallbackQuery):
+    try:
+        # Проверяем наличие reply_to_message
+        if not callback.message or not callback.message.reply_to_message:
+            await callback.answer("❌ Не удалось определить заявку")
+            return
+            
+        group_message_id = callback.message.reply_to_message.message_id
+        
+        # Проверяем наличие заявки в хранилище
+        if group_message_id not in storage:
+            logger.warning(f"Заявка с ID {group_message_id} не найдена в хранилище")
+            await callback.answer("❌ Заявка не найдена в системе")
+            return
+
+        user_data = storage[group_message_id]
+        user_id = user_data.get("user_id")
+        user_name = user_data.get("user_name", "Неизвестный")
+        
+        if not user_id:
+            await callback.answer("❌ Не удалось найти данные пользователя")
+            return
+
+        # Создаем ссылку на личный чат с пользователем
+        user_link = f"tg://user?id={user_id}"
+        
+        # Отправляем ОДНО компактное сообщение в основную группу
+        await send_message_with_retry(
+            callback.bot,
+            chat_id=GROUP_ID,
+            text=f"💬 [{user_name}]({user_link}) ← {callback.from_user.first_name}",
+            parse_mode="Markdown",
+            reply_to_message_id=group_message_id,
+            disable_web_page_preview=True
+        )
+        
+        await callback.answer("✅ Ссылка создана")
+        
+    except Exception as e:
+        logger.error(f"Ошибка при создании связи с монтажником: {str(e)}", exc_info=True)
+        await callback.answer("❌ Ошибка при создании ссылки")
+
 
 
 
@@ -2835,6 +3024,13 @@ async def other_messages(message: Message, state: FSMContext):
         return
 
     await message.reply("⚠️ Используй кнопки меню", reply_markup=kb.main)
+
+
+
+
+
+
+
 
 # Добавь новый обработчик для игнорирования сообщений в группах
 @router.message()
