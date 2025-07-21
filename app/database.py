@@ -275,6 +275,42 @@ class Database:
         except Exception as e:
             logger.error(f"Ошибка получения статистики за период: {str(e)}")
             return {}
+        
+def sync_storage_to_db(self, storage_data):
+    """Синхронизирует данные из storage с базой данных"""
+    try:
+        for req_id, req_data in storage_data.items():
+            if isinstance(req_data, dict) and req_data.get("user_id"):
+                # Проверяем, есть ли запись в БД
+                cursor = self.conn.cursor()
+                cursor.execute('SELECT status FROM requests WHERE request_id = ?', (str(req_id),))
+                result = cursor.fetchone()
+                
+                if result:
+                    # Обновляем статус если заявка завершена в storage
+                    if req_data.get("is_completed", False) and result[0] != "completed":
+                        self.update_request_status(str(req_id), "completed", "system_sync")
+                        logger.info(f"Синхронизирован статус заявки {req_id}: completed")
+                else:
+                    # Создаем запись если её нет
+                    self.save_request(
+                        request_id=str(req_id),
+                        user_id=req_data.get("user_id"),
+                        user_name=req_data.get("user_name", ""),
+                        address=req_data.get("adres", ""),
+                        request_type=req_data.get("replacement_type", "regular"),
+                        gid=req_data.get("gid", ""),
+                        photo_path=""
+                    )
+                    logger.info(f"Создана запись для заявки {req_id}")
+                
+        self.conn.commit()
+        
+    except Exception as e:
+        logger.error(f"Ошибка синхронизации storage с БД: {e}")
+        self.conn.rollback()
+  
 
 # Создаем глобальный экземпляр базы данных
 db = Database()
+

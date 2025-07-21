@@ -6,6 +6,10 @@ from aiogram.fsm.state import StatesGroup, State
 from aiogram.fsm.context import FSMContext
 from aiogram.types import ContentType, InputMediaPhoto, ReplyKeyboardRemove, InlineKeyboardButton, InlineKeyboardMarkup, BufferedInputFile
 from app.database import db
+from aiogram.filters import Command
+
+
+
 
 import os
 import uuid
@@ -29,6 +33,25 @@ from io import BytesIO  # ← И ЭТУ СТРОКУ
 router = Router()
 logger = logging.getLogger(__name__)
 storage = {}
+
+async def cleanup_completed_requests():
+    """Очищает завершённые заявки из storage"""
+    completed_requests = []
+    current_time = datetime.datetime.now()
+    
+    for req_id, req_data in list(storage.items()):
+        if req_data.get("is_completed", False):
+            # Проверяем, что заявка завершена более 30 минут назад
+            completed_at = req_data.get("completed_at")
+            if completed_at and (current_time - completed_at).total_seconds() > 1800:  # 30 минут
+                completed_requests.append(req_id)
+    
+    for req_id in completed_requests:
+        del storage[req_id]
+    
+    if completed_requests:
+        logger.info(f"Очищено завершённых заявок из storage: {len(completed_requests)}")
+
 
 
 # Добавим улучшенную функцию для отправки сообщений с обработкой ограничений
@@ -206,7 +229,6 @@ async def refresh_requests(message: Message, state: FSMContext):
         # Фильтруем только активные (незавершенные) заявки
         active_requests = {}
         for req_id, req_data in storage.items():
-            # Проверяем, не помечена ли заявка как завершенной
             if isinstance(req_data, dict) and not req_data.get("is_completed", False):
                 active_requests[req_id] = req_data
 
@@ -232,7 +254,6 @@ async def refresh_requests(message: Message, state: FSMContext):
                             chat_id=GROUP_ID,
                             message_id=msg_id
                         )
-                # Добавляем задержку после удаления сообщений
                 await asyncio.sleep(0.3)
             except Exception as e:
                 logger.debug(f"Ошибка при удалении сообщения: {str(e)}")
@@ -241,26 +262,21 @@ async def refresh_requests(message: Message, state: FSMContext):
         updated_count = 0
         for request_id, request_data in list(active_requests.items()):
             try:
-                # Проверяем наличие необходимых данных
                 if "media" not in request_data:
                     logger.warning(f"Заявка {request_id} не содержит медиа-данных")
                     continue
 
-                # Получаем адрес из данных заявки
                 adres = request_data.get("adres", "")
                 user_name = request_data.get("user_name", "Неизвестный")
                 
-                # Если есть адрес, отправляем его перед медиа-группой
                 if adres:
                     await send_message_with_retry(
                         message.bot,
                         chat_id=GROUP_ID,
                         text=f"Отправитель: {user_name}\nАдрес: {adres}"
                     )
-                    # Добавляем небольшую задержку
                     await asyncio.sleep(0.5)
 
-                # Используем безопасную отправку медиа-группы
                 sent_messages = await safe_send_media_group(
                     message.bot,
                     GROUP_ID,
@@ -269,10 +285,8 @@ async def refresh_requests(message: Message, state: FSMContext):
 
                 media_group_ids = [msg.message_id for msg in sent_messages]
 
-                # Определяем, какую клавиатуру использовать
                 keyboard = kb.moderator_full
                 if request_data.get("is_accepted", False):
-                    # Если заявка уже принята, показываем только кнопки проблем со связью
                     keyboard = InlineKeyboardMarkup(
                         inline_keyboard=[
                             [
@@ -289,10 +303,8 @@ async def refresh_requests(message: Message, state: FSMContext):
                         ]
                     )
 
-                # Добавляем задержку перед отправкой сообщения с кнопками
                 await asyncio.sleep(0.5)
 
-                # Отправляем сообщение с кнопками
                 button_message = await send_message_with_retry(
                     message.bot,
                     GROUP_ID,
@@ -301,14 +313,31 @@ async def refresh_requests(message: Message, state: FSMContext):
                     reply_to_message_id=media_group_ids[0]
                 )
 
+                # ИСПРАВЛЕНИЕ: Обновляем БД с новым request_id
+                old_request_id = str(request_id)
+                new_request_id = str(media_group_ids[0])
+                
+                # Обновляем request_id в базе данных
+                try:
+                    with sqlite3.connect(db.db_path) as conn:
+                        cursor = conn.cursor()
+                        cursor.execute('''
+                            UPDATE requests 
+                            SET request_id = ? 
+                            WHERE request_id = ?
+                        ''', (new_request_id, old_request_id))
+                        conn.commit()
+                        logger.info(f"БД обновлена: {old_request_id} -> {new_request_id}")
+                except Exception as e:
+                    logger.error(f"Ошибка обновления БД: {str(e)}")
+
                 # Обновляем информацию о заявке в хранилище
                 new_request_data = {
-                    **request_data,  # Сохраняем все существующие данные
+                    **request_data,
                     "button_message_id": button_message.message_id,
                     "media_group_ids": media_group_ids
                 }
                 
-                # Явно сохраняем адрес и имя пользователя, если они есть
                 if adres:
                     new_request_data["adres"] = adres
                 if user_name:
@@ -317,53 +346,43 @@ async def refresh_requests(message: Message, state: FSMContext):
                 # Сохраняем обновленную заявку с новым ID
                 storage[media_group_ids[0]] = new_request_data
                 
-                # Если у пользователя есть активное состояние, обновляем его
+                # Обновляем состояние пользователя
                 if "user_id" in request_data:
                     user_id = request_data["user_id"]
                     try:
-                        # Используем state вместо message.bot.fsm
                         user_state = FSMContext(
                             storage=state.storage,
                             key=StorageKey(chat_id=user_id, user_id=user_id, bot_id=message.bot.id)
                         )
                         
-                        # Проверяем текущее состояние пользователя
                         current_state = await user_state.get_state()
                         if current_state == Reg.final_photo.state:
-                            # Получаем текущие данные пользователя
                             user_data = await user_state.get_data()
                             
-                            # Создаем новый словарь без конфликтующих ключей
                             user_data_updated = {}
                             for k, v in user_data.items():
                                 if k not in ['group_message_id', 'adres']:
                                     user_data_updated[k] = v
                             
-                            # Добавляем обновленные данные
                             user_data_updated['group_message_id'] = media_group_ids[0]
                             if adres:
                                 user_data_updated['adres'] = adres
                                 
-                            # Обновляем состояние пользователя
                             await user_state.update_data(**user_data_updated)
                     except Exception as e:
                         logger.error(f"Ошибка при обновлении состояния пользователя {user_id}: {str(e)}")
                 
-                # Удаляем старую запись, если ID изменился
+                # Удаляем старую запись
                 if request_id != media_group_ids[0]:
                     del storage[request_id]
 
                 updated_count += 1
-                
-                # Делаем паузу между отправками, чтобы избежать ограничений
                 await asyncio.sleep(2)
 
             except Exception as e:
                 logger.error(f"Ошибка при переотправке заявки {request_id}: {str(e)}")
-                # Добавляем задержку в случае ошибки
                 await asyncio.sleep(1)
 
-        # Используем функцию с повторными попытками для финального сообщения
         await send_message_with_retry(
             message.bot,
             chat_id=message.chat.id,
@@ -373,7 +392,6 @@ async def refresh_requests(message: Message, state: FSMContext):
     except Exception as e:
         logger.error(f"Ошибка в /refresh: {str(e)}")
         try:
-            # Используем функцию с повторными попытками для сообщения об ошибке
             await send_message_with_retry(
                 message.bot,
                 chat_id=message.chat.id,
@@ -381,6 +399,7 @@ async def refresh_requests(message: Message, state: FSMContext):
             )
         except Exception as e2:
             logger.error(f"Не удалось отправить сообщение об ошибке: {str(e2)}")
+
 
 
 
@@ -726,25 +745,37 @@ async def refresh_button(message: Message, state: FSMContext):
 
 @router.message(F.text == 'регистрация экрана')
 async def start_registration(message: Message, state: FSMContext):
+    # Добавь эту строку в самое начало функции
+    if message.chat.type != 'private':
+        return
     logger.info(f"👤 Пользователь {message.from_user.full_name} (ID: {message.from_user.id}) начал регистрацию")
     await state.set_state(Reg.adres)
     await message.answer("📍 Введите адрес ПВЗ:", reply_markup=kb.cancel_kb)
 
-
-
 @router.message(F.text == 'замена оборудования')
 async def start_replacement(message: Message, state: FSMContext):
+    # Добавь эту строку
+    if message.chat.type != 'private':
+        return
+
     logger.info(f"👤 Пользователь {message.from_user.full_name} (ID: {message.from_user.id}) начал замену оборудования")
     await message.answer("🔧 Выберите тип замены:", reply_markup=kb.replacement_type_kb)
 
 @router.message(F.text == 'замена OPS')
 async def start_ops_replacement(message: Message, state: FSMContext):
+    # Добавь эту строку
+    if message.chat.type != 'private':
+        return
+
     logger.info(f"👤 Пользователь {message.from_user.full_name} выбрал замену OPS")
     await state.set_state(OpsReplacement.adres)
     await message.answer("📍 Введите адрес ремонта:", reply_markup=kb.cancel_kb)
 
 @router.message(F.text == 'замена Телевизора')
 async def start_tv_replacement(message: Message, state: FSMContext):
+    # Добавь эту строку
+    if message.chat.type != 'private':
+        return
     logger.info(f"👤 Пользователь {message.from_user.full_name} выбрал замену телевизора")
     await state.set_state(TvReplacement.adres)
     await message.answer("📍 Введите адрес ремонта:", reply_markup=kb.cancel_kb)
@@ -1131,6 +1162,9 @@ async def tv_final_step(message: Message, state: FSMContext):
 
 @router.message(Reg.adres)
 async def save_adres(message: Message, state: FSMContext):
+    # Добавь эту строку в самое начало
+    if message.chat.type != 'private':
+        return
     if message.text == "❌ Отмена":
         logger.info(f"❌ Пользователь {message.from_user.full_name} отменил регистрацию на этапе ввода адреса")
         await state.clear()
@@ -1144,7 +1178,10 @@ async def save_adres(message: Message, state: FSMContext):
 
 
 @router.message(Reg.photo)
-async def save_photo1(message: Message, state: FSMContext):
+async def save_adres(message: Message, state: FSMContext):
+    if message.chat.type != 'private':
+        return
+
     if message.text == "❌ Отмена":
         await state.clear()
         await message.answer("❎ Регистрация отменена", reply_markup=kb.main)
@@ -1182,7 +1219,7 @@ async def save_photo1(message: Message, state: FSMContext):
 
 
 @router.message(Reg.photo2)
-async def save_photo2(message: Message, state: FSMContext):
+async def save_adres(message: Message, state: FSMContext):
     if message.text == "❌ Отмена":
         await state.clear()
         await message.answer("❎ Регистрация отменена", reply_markup=kb.main)
@@ -1220,7 +1257,7 @@ async def save_photo2(message: Message, state: FSMContext):
 
 
 @router.message(Reg.photo3)
-async def save_photo3(message: Message, state: FSMContext):
+async def save_adres(message: Message, state: FSMContext):
     if message.text == "❌ Отмена":
         await state.clear()
         await message.answer("❎ Регистрация отменена", reply_markup=kb.main)
@@ -1336,6 +1373,18 @@ async def waiting_handler(message: Message, state: FSMContext):
     else:
         await message.answer("⚠️ У вас нет активных заявок на рассмотрении.", reply_markup=kb.main)
         await state.clear()
+
+
+
+
+# Обработчик для групповых чатов - игнорирует команды меню
+@router.message(F.text.in_(['регистрация экрана', 'замена оборудования', 'замена OPS', 'замена Телевизора']))
+async def ignore_menu_in_groups(message: Message):
+    if message.chat.type != 'private':
+        return
+
+    # Просто игнорируем эти сообщения в группах
+    pass
 
 
 
@@ -1806,7 +1855,7 @@ async def accept_registration(callback: CallbackQuery, state: FSMContext):
 
 
 @router.message(Reg.final_photo)
-async def final_step(message: Message, state: FSMContext):
+async def save_adres(message: Message, state: FSMContext):
     try:
         data = await state.get_data()
         if data.get("final_photo_sent", False):
@@ -1905,7 +1954,6 @@ async def final_step(message: Message, state: FSMContext):
 
 
 
-# Заменим функцию accept_final_photo и reject_final_photo:
 @router.callback_query(F.data.startswith("accept_final:"))
 async def accept_final_photo(callback: CallbackQuery, state: FSMContext):
     try:
@@ -1924,22 +1972,33 @@ async def accept_final_photo(callback: CallbackQuery, state: FSMContext):
 
         group_message_id = storage_data.get("group_message_id")
         
-        # Помечаем заявку как завершенную
+        # Помечаем заявку как завершенную в storage с временной меткой
         storage[final_message_id]["is_completed"] = True
-        db.update_request_status(
-            str(final_message_id), 
-            "completed", 
-            callback.from_user.full_name
-        )
-
-        if group_message_id and group_message_id in storage:
-            storage[group_message_id]["is_completed"] = True
+        storage[final_message_id]["completed_at"] = datetime.datetime.now()
         
-        # Если есть связанная основная заявка, помечаем и её как завершенную
-        if group_message_id and group_message_id in storage:
-            storage[group_message_id]["is_completed"] = True
+        # ИСПРАВЛЕНИЕ: используем правильный request_id для обновления в базе
+        if group_message_id:
+            # Обновляем статус в базе данных по group_message_id
+            db.update_request_status(
+                str(group_message_id),  # Используем group_message_id вместо final_message_id
+                "completed", 
+                callback.from_user.full_name
+            )
             
-            # Пытаемся удалить сообщение с кнопками в основной группе
+            # Также помечаем основную заявку как завершенную
+            if group_message_id in storage:
+                storage[group_message_id]["is_completed"] = True
+                storage[group_message_id]["completed_at"] = datetime.datetime.now()
+        else:
+            # Если нет group_message_id, используем final_message_id
+            db.update_request_status(
+                str(final_message_id), 
+                "completed", 
+                callback.from_user.full_name
+            )
+
+        # Удаляем сообщение с кнопками в основной группе
+        if group_message_id and group_message_id in storage:
             try:
                 await safe_delete_message(
                     callback.bot,
@@ -1972,13 +2031,17 @@ async def accept_final_photo(callback: CallbackQuery, state: FSMContext):
         await user_state.clear()
 
         # Логируем успешное завершение
-        logger.info(f"Заявка {final_message_id} успешно завершена для пользователя {user_id}")
+        logger.info(f"Заявка {final_message_id} (основная: {group_message_id}) успешно завершена для пользователя {user_id}")
+        
+        # Запускаем очистку завершённых заявок
+        await cleanup_completed_requests()
         
         await callback.answer("✅ Заявка принята")
 
     except Exception as e:
         logger.error(f"Ошибка при принятии финального фото: {str(e)}", exc_info=True)
         await callback.answer("❌ Ошибка при принятии заявки.")
+
 
 
 
@@ -2135,6 +2198,20 @@ async def sync_database(message: Message):
 
 
 
+@router.message(Command("sync"))
+async def sync_storage_command(message: Message):
+    if message.from_user.id not in ADMINS:
+        await message.answer("❌ Эта команда доступна только администраторам")
+        return
+    
+    try:
+        # Синхронизируем storage с базой данных
+        db.sync_storage_to_db(storage)
+        await message.answer("✅ Синхронизация завершена")
+        
+    except Exception as e:
+        logger.error(f"Ошибка синхронизации: {str(e)}")
+        await message.answer("❌ Ошибка синхронизации")
 
 
 
@@ -2449,6 +2526,11 @@ async def check_connection_again(callback: CallbackQuery):
             await callback.answer("❌ Ваша заявка не найдена")
             return
         
+        # ИСПРАВЛЕНИЕ: Проверяем, существует ли заявка в storage
+        if request_id not in storage:
+            await callback.answer("❌ Заявка была обновлена. Попробуйте ещё раз.")
+            return
+        
         # Создаем клавиатуру для результатов проверки связи
         connection_result_kb = InlineKeyboardMarkup(inline_keyboard=[
             [
@@ -2457,12 +2539,12 @@ async def check_connection_again(callback: CallbackQuery):
             ]
         ])
         
-        # Удаляем предыдущие статусные сообщения
+        # ИСПРАВЛЕНИЕ: Безопасно удаляем предыдущие статусные сообщения
         if "status_messages" in storage[request_id]:
             for msg_id in storage[request_id]["status_messages"]:
                 await safe_delete_message(callback.bot, GROUP_ID, msg_id)
         
-        # Отправляем новое сообщение в группу модераторов БЕЗ reply_to_message_id
+        # Отправляем новое сообщение в группу модераторов
         try:
             # Сначала пробуем отправить с привязкой к сообщению
             status_msg = await send_message_with_retry(
@@ -2482,8 +2564,9 @@ async def check_connection_again(callback: CallbackQuery):
                 reply_markup=connection_result_kb
             )
         
-        # Сохраняем ID нового статусного сообщения
-        storage[request_id]["status_messages"] = [status_msg.message_id]
+        # ИСПРАВЛЕНИЕ: Безопасно сохраняем ID нового статусного сообщения
+        if request_id in storage:
+            storage[request_id]["status_messages"] = [status_msg.message_id]
         
         # Редактируем сообщение пользователя
         try:
@@ -2498,9 +2581,13 @@ async def check_connection_again(callback: CallbackQuery):
         
         await callback.answer("✅ Запрос на проверку отправлен")
         
+    except KeyError as e:
+        logger.error(f"Заявка не найдена в storage: {str(e)}")
+        await callback.answer("❌ Заявка была обновлена. Попробуйте ещё раз.")
     except Exception as e:
         logger.error(f"Ошибка при запросе повторной проверки: {str(e)}", exc_info=True)
         await callback.answer("❌ Ошибка при отправке запроса")
+
 
 @router.callback_query(F.data == "connection_restored")
 async def connection_restored(callback: CallbackQuery):
@@ -2533,8 +2620,9 @@ async def connection_restored(callback: CallbackQuery):
                     group_message_id = req_id
                     break
         
+        # ИСПРАВЛЕНИЕ: Проверяем существование заявки
         if not group_message_id or group_message_id not in storage:
-            await callback.answer("❌ Заявка не найдена")
+            await callback.answer("❌ Заявка не найдена или была обновлена")
             return
         
         user_id = storage[group_message_id]["user_id"]
@@ -2550,7 +2638,7 @@ async def connection_restored(callback: CallbackQuery):
         # Обновляем статус заявки
         storage[group_message_id]["is_accepted"] = True
         
-        # Удаляем предыдущие статусные сообщения
+        # ИСПРАВЛЕНИЕ: Безопасно удаляем предыдущие статусные сообщения
         if "status_messages" in storage[group_message_id]:
             for msg_id in storage[group_message_id]["status_messages"]:
                 await safe_delete_message(callback.bot, GROUP_ID, msg_id)
@@ -2572,14 +2660,18 @@ async def connection_restored(callback: CallbackQuery):
                 text=f"✅ Связь восстановлена. Пользователь уведомлен.\nПроверил: {callback.from_user.full_name}\n(Заявка ID: {group_message_id})"
             )
 
-        # Сохраняем ID финального статусного сообщения
-        storage[group_message_id]["status_messages"] = [final_status_msg.message_id]
+        # ИСПРАВЛЕНИЕ: Безопасно сохраняем ID финального статусного сообщения
+        if group_message_id in storage:
+            storage[group_message_id]["status_messages"] = [final_status_msg.message_id]
         
         # Удаляем текущее сообщение с кнопками
         await safe_delete_message(callback.bot, GROUP_ID, callback.message.message_id)
         
         await callback.answer("✅ Пользователь уведомлен")
         
+    except KeyError as e:
+        logger.error(f"Заявка не найдена в storage: {str(e)}")
+        await callback.answer("❌ Заявка была обновлена")
     except Exception as e:
         logger.error(f"Ошибка при восстановлении связи: {str(e)}", exc_info=True)
         await callback.answer("❌ Ошибка")
@@ -2615,8 +2707,9 @@ async def connection_still_bad(callback: CallbackQuery):
                     group_message_id = req_id
                     break
         
+        # ИСПРАВЛЕНИЕ: Проверяем существование заявки
         if not group_message_id or group_message_id not in storage:
-            await callback.answer("❌ Заявка не найдена")
+            await callback.answer("❌ Заявка не найдена или была обновлена")
             return
         
         user_id = storage[group_message_id]["user_id"]
@@ -2633,7 +2726,7 @@ async def connection_still_bad(callback: CallbackQuery):
             reply_markup=check_connection_kb
         )
         
-        # Удаляем предыдущие статусные сообщения
+        # ИСПРАВЛЕНИЕ: Безопасно удаляем предыдущие статусные сообщения
         if "status_messages" in storage[group_message_id]:
             for msg_id in storage[group_message_id]["status_messages"]:
                 await safe_delete_message(callback.bot, GROUP_ID, msg_id)
@@ -2655,17 +2748,22 @@ async def connection_still_bad(callback: CallbackQuery):
                 text=f"❌ Связь не восстановлена. Пользователю отправлено уведомление.\nПроверил: {callback.from_user.full_name}\n(Заявка ID: {group_message_id})"
             )
 
-        # Сохраняем ID нового статусного сообщения
-        storage[group_message_id]["status_messages"] = [status_msg.message_id]
+        # ИСПРАВЛЕНИЕ: Безопасно сохраняем ID нового статусного сообщения
+        if group_message_id in storage:
+            storage[group_message_id]["status_messages"] = [status_msg.message_id]
         
         # Удаляем текущее сообщение с кнопками
         await safe_delete_message(callback.bot, GROUP_ID, callback.message.message_id)
         
         await callback.answer("✅ Пользователь уведомлен")
         
+    except KeyError as e:
+        logger.error(f"Заявка не найдена в storage: {str(e)}")
+        await callback.answer("❌ Заявка была обновлена")
     except Exception as e:
         logger.error(f"Ошибка при обработке плохой связи: {str(e)}", exc_info=True)
         await callback.answer("❌ Ошибка")
+
 
 
 
@@ -2717,6 +2815,9 @@ async def cancel(message: Message, state: FSMContext):
 
 @router.message()
 async def other_messages(message: Message, state: FSMContext):
+    if message.chat.type != 'private':
+       return
+
     current_state = await state.get_state()
 
     if current_state:
@@ -2733,5 +2834,13 @@ async def other_messages(message: Message, state: FSMContext):
             await message.answer("📝 Пожалуйста, введите текст или используйте кнопки.")
         return
 
-    if message.chat.id not in [GROUP_ID, GROUP_ID_2, GROUP_ID_3]:
-        await message.reply("⚠️ Используй кнопки меню", reply_markup=kb.main)
+    await message.reply("⚠️ Используй кнопки меню", reply_markup=kb.main)
+
+# Добавь новый обработчик для игнорирования сообщений в группах
+@router.message()
+async def ignore_messages_in_groups(message: Message):
+    if message.chat.type != 'private':
+        return
+
+    # Игнорируем все сообщения в группах, которые не обработались другими обработчиками
+    pass
