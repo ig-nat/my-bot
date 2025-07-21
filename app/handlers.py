@@ -7,6 +7,8 @@ from aiogram.fsm.context import FSMContext
 from aiogram.types import ContentType, InputMediaPhoto, ReplyKeyboardRemove, InlineKeyboardButton, InlineKeyboardMarkup, BufferedInputFile
 from app.database import db
 from aiogram.filters import Command
+from app.redis_client import redis_client
+import datetime
 
 
 
@@ -33,6 +35,23 @@ from io import BytesIO  # ← И ЭТУ СТРОКУ
 router = Router()
 logger = logging.getLogger(__name__)
 storage = {}
+
+
+def restore_storage_from_redis():
+    """Восстановление storage из Redis при запуске"""
+    try:
+        active_requests = redis_client.get_all_active_requests()
+        storage.clear()
+        storage.update(active_requests)
+        logger.info(f"🔄 Восстановлено {len(active_requests)} заявок из Redis")
+    except Exception as e:
+        logger.error(f"Ошибка восстановления заявок из Redis: {str(e)}")
+
+# Вызываем восстановление при импорте модуля
+restore_storage_from_redis()
+
+
+
 
 async def cleanup_completed_requests():
     """Очищает завершённые заявки из storage"""
@@ -934,6 +953,9 @@ async def save_ops_screen_photo(message: Message, state: FSMContext):
                 "adres": adres,
                 "replacement_type": "OPS"  # Добавляем тип замены
             }
+
+            redis_client.save_request(str(media_group_ids[0]), storage[media_group_ids[0]])
+
             # Сохраняем в базу данных
             db.save_request(
                 request_id=str(media_group_ids[0]),
@@ -1021,6 +1043,9 @@ async def save_tv_photo(message: Message, state: FSMContext):
                 "adres": adres,
                 "replacement_type": "TV"
             }
+            redis_client.save_request(str(media_group_ids[0]), storage[media_group_ids[0]])
+
+
             # Сохраняем в базу данных
             db.save_request(
                 request_id=str(sent_message.message_id),
@@ -1374,6 +1399,7 @@ async def save_photo3(message: Message, state: FSMContext):
 
             # Сохраняем информацию о заявке с адресом И городом
             storage[media_group_ids[0]] = {
+                
                 "user_id": message.from_user.id,
                 "user_name": user_name,
                 "button_message_id": button_message.message_id,
@@ -1383,7 +1409,11 @@ async def save_photo3(message: Message, state: FSMContext):
                 "adres": adres,
                 "city": city  # ← ДОБАВИЛИ ГОРОД В STORAGE
             }
-            
+
+
+            redis_client.save_request(str(media_group_ids[0]), storage[media_group_ids[0]])
+
+
             # Сохраняем в базу данных
             db.save_request(
                 request_id=str(media_group_ids[0]),
@@ -1777,6 +1807,11 @@ async def handle_gid(message: Message, state: FSMContext):
         # Обновляем статус заявки
         storage[group_message_id]["is_accepted"] = True
         storage[group_message_id]["gid"] = message.text
+        redis_client.update_request(str(group_message_id), {
+        "is_accepted": True,
+        "gid": message.text
+    })
+        storage[group_message_id]["gid"] = message.text
         
         db.update_request_gid(str(group_message_id), message.text)
         user_id = storage[group_message_id]["user_id"]
@@ -2077,7 +2112,9 @@ async def accept_final_photo(callback: CallbackQuery, state: FSMContext):
         )
         
         # Помечаем заявку как завершенную
-        storage[final_message_id]["is_completed"] = True
+        redis_client.complete_request(str(final_message_id))
+        if group_message_id:
+            redis_client.complete_request(str(group_message_id))
         storage[final_message_id]["moderator_name"] = moderator_name
         db.update_request_status(
             str(final_message_id), 
@@ -2780,6 +2817,11 @@ async def connection_restored(callback: CallbackQuery):
         
         # Обновляем статус заявки
         storage[group_message_id]["is_accepted"] = True
+        storage[group_message_id]["gid"] = message.text
+        redis_client.update_request(str(group_message_id), {
+        "is_accepted": True,
+           "gid": message.text
+        })
         
         # ИСПРАВЛЕНИЕ: Безопасно удаляем предыдущие статусные сообщения
         if "status_messages" in storage[group_message_id]:
