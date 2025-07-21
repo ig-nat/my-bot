@@ -5,7 +5,7 @@ import sys
 import platform
 import os
 from aiogram import Bot, Dispatcher
-from app.handlers import router
+from app.handlers import router  # импортируем роутер из handlers.py
 from app.config import TOKEN, GROUP_ID, ADMINS
 from aiogram.types import BotCommand, BotCommandScopeAllGroupChats
 from aiogram.fsm.storage.memory import MemoryStorage

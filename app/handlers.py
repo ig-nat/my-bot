@@ -7,6 +7,10 @@ from aiogram.fsm.context import FSMContext
 from aiogram.types import ContentType, InputMediaPhoto, ReplyKeyboardRemove, InlineKeyboardButton, InlineKeyboardMarkup, BufferedInputFile
 from app.database import db
 
+import os
+import uuid
+from app.utils import save_photo_file
+
 import app.keyboards as kb
 from app.config import GROUP_ID, GROUP_ID_2, GROUP_ID_3, ADMINS, TOKEN
 from aiogram.fsm.storage.base import StorageKey
@@ -189,6 +193,41 @@ async def with_rate_limit(func, *args, **kwargs):
                     raise
                 await asyncio.sleep(1)
 
+@router.message(F.content_type == ContentType.PHOTO)
+async def handle_photo(message: Message):
+    try:
+        photo = message.photo[-1]
+        # Получаем объект File через bot.get_file
+        file = await message.bot.get_file(photo.file_id)
+        
+        # Создаём BytesIO для хранения файла
+        file_bytes = BytesIO()
+        
+        # Скачиваем файл по file_path в BytesIO
+        await message.bot.download_file(file.file_path, destination=file_bytes)
+        
+        file_bytes.seek(0)
+        data = file_bytes.read()
+
+        saved_path = save_photo_file(data)
+        request_id = str(uuid.uuid4())
+
+        db.save_request(
+            request_id=request_id,
+            user_id=message.from_user.id,
+            user_name=message.from_user.full_name or "",
+            address="",
+            request_type="regular",
+            gid="",
+            photo_path=saved_path
+        )
+
+        await message.answer("✅ Фото сохранено и заявка зарегистрирована.")
+
+    except Exception as e:
+        await message.answer("❌ Ошибка при сохранении фото.")
+        import logging
+        logging.error(f"Ошибка в handle_photo: {e}", exc_info=True)
 
 
 @router.message(Command("refresh"))
@@ -2624,6 +2663,11 @@ async def connection_still_bad(callback: CallbackQuery):
 @router.callback_query(F.data == "ignore")
 async def ignore_callback(callback: CallbackQuery):
     await callback.answer()
+
+
+
+
+
 
 
 @router.message(F.text == "❌ Отмена")

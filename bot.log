@@ -4108,3 +4108,85 @@ Original description: Too Many Requests: retry after 5
 2025-07-21 15:34:29,473 - app.handlers - ИНФО - 📍 Пользователь Игнат ввел адрес: Двдвдв
 2025-07-21 15:34:38,191 - app.database - ИНФО - Заявка 7442 сохранена в БД с фото: 
 2025-07-21 15:34:38,323 - app.handlers - ИНФО - 📝 Заявка от Игнат создана с адресом: Двдвдв
+2025-07-21 16:33:34,097 - __main__ - ИНФО - 🎯 Запуск главного процесса бота на Windows
+2025-07-21 16:33:34,098 - __main__ - ИНФО - 📄 Файл лога: bot.log
+2025-07-21 16:33:34,888 - app.bot - ИНФО - 🚀 Бот запущен на Windows и готов к работе
+2025-07-21 16:33:34,889 - app.bot - ИНФО - 📄 Файл лога: bot.log
+2025-07-21 16:33:35,053 - app.bot - ИНФО - Админ-панель отправлена в группу -1002392016711
+2025-07-21 16:33:35,053 - app.bot - ИНФО - 📡 Запуск поллинга...
+2025-07-21 16:34:15,844 - __main__ - ИНФО - 🎯 Запуск главного процесса бота на Windows
+2025-07-21 16:34:15,844 - __main__ - ИНФО - 📄 Файл лога: bot.log
+2025-07-21 16:34:16,513 - app.bot - ИНФО - 🚀 Бот запущен на Windows и готов к работе
+2025-07-21 16:34:16,513 - app.bot - ИНФО - 📄 Файл лога: bot.log
+2025-07-21 16:34:16,653 - app.bot - ИНФО - Админ-панель отправлена в группу -1002392016711
+2025-07-21 16:34:16,653 - app.bot - ИНФО - 📡 Запуск поллинга...
+2025-07-21 16:48:40,802 - __main__ - ИНФО - 🎯 Запуск главного процесса бота на Windows
+2025-07-21 16:48:40,802 - __main__ - ИНФО - 📄 Файл лога: bot.log
+2025-07-21 16:48:41,505 - app.bot - ИНФО - 🚀 Бот запущен на Windows и готов к работе
+2025-07-21 16:48:41,505 - app.bot - ИНФО - 📄 Файл лога: bot.log
+2025-07-21 16:48:41,660 - app.bot - ИНФО - Админ-панель отправлена в группу -1002392016711
+2025-07-21 16:48:41,660 - app.bot - ИНФО - 📡 Запуск поллинга...
+2025-07-21 16:49:31,811 - app.handlers - ИНФО - 👤 Пользователь Игнат (ID: 1602581828) начал регистрацию
+2025-07-21 16:49:35,572 - app.handlers - ИНФО - 📍 Пользователь Игнат ввел адрес: Оаоаоала
+2025-07-21 16:49:38,589 - root - ОШИБКА - Ошибка в handle_photo: 'PhotoSize' object has no attribute 'download'
+Traceback (most recent call last):
+  File "c:\Users\G\PycharmProjects\Bot __v.1.7 betta_много_кнопок\app\handlers.py", line 200, in handle_photo
+    file = await photo.download(destination=BytesIO())
+                 ^^^^^^^^^^^^^^
+  File "C:\Users\G\PycharmProjects\Bot __v.1.7 betta_много_кнопок\.venv\Lib\site-packages\pydantic\main.py", line 891, in __getattr__
+    raise AttributeError(f'{type(self).__name__!r} object has no attribute {item!r}')
+AttributeError: 'PhotoSize' object has no attribute 'download'
+2025-07-21 16:49:40,567 - root - ОШИБКА - Ошибка в handle_photo: 'PhotoSize' object has no attribute 'download'
+Traceback (most recent call last):
+  File "c:\Users\G\PycharmProjects\Bot __v.1.7 betta_много_кнопок\app\handlers.py", line 200, in handle_photo
+    file = await photo.download(destination=BytesIO())
+                 ^^^^^^^^^^^^^^
+  File "C:\Users\G\PycharmProjects\Bot __v.1.7 betta_много_кнопок\.venv\Lib\site-packages\pydantic\main.py", line 891, in __getattr__
+    raise AttributeError(f'{type(self).__name__!r} object has no attribute {item!r}')
+AttributeError: 'PhotoSize' object has no attribute 'download'
+2025-07-21 16:49:42,838 - root - ОШИБКА - Ошибка в handle_photo: 'PhotoSize' object has no attribute 'download'
+Traceback (most recent call last):
+  File "c:\Users\G\PycharmProjects\Bot __v.1.7 betta_много_кнопок\app\handlers.py", line 200, in handle_photo
+    file = await photo.download(destination=BytesIO())
+                 ^^^^^^^^^^^^^^
+  File "C:\Users\G\PycharmProjects\Bot __v.1.7 betta_много_кнопок\.venv\Lib\site-packages\pydantic\main.py", line 891, in __getattr__
+    raise AttributeError(f'{type(self).__name__!r} object has no attribute {item!r}')
+AttributeError: 'PhotoSize' object has no attribute 'download'
+2025-07-21 16:50:01,113 - app.bot - ИНФО - 🛑 Бот останавливается...
+2025-07-21 16:50:01,113 - app.bot - ИНФО - Сессия бота закрыта
+2025-07-21 16:50:01,114 - app.bot - ИНФО - Ожидание завершения 2 задач...
+2025-07-21 16:50:01,114 - app.bot - ИНФО - ✅ Бот полностью остановлен
+2025-07-21 16:50:01,116 - __main__ - ИНФО - 🛑 Бот остановлен пользователем
+2025-07-21 16:50:01,116 - __main__ - ИНФО - ✅ Бот полностью остановлен
+2025-07-21 16:50:44,799 - __main__ - ИНФО - 🎯 Запуск главного процесса бота на Windows
+2025-07-21 16:50:44,799 - __main__ - ИНФО - 📄 Файл лога: bot.log
+2025-07-21 16:50:45,566 - app.bot - ИНФО - 🚀 Бот запущен на Windows и готов к работе
+2025-07-21 16:50:45,567 - app.bot - ИНФО - 📄 Файл лога: bot.log
+2025-07-21 16:50:45,801 - app.bot - ИНФО - Админ-панель отправлена в группу -1002392016711
+2025-07-21 16:50:45,802 - app.bot - ИНФО - 📡 Запуск поллинга...
+2025-07-21 16:51:02,090 - app.handlers - ИНФО - 👤 Пользователь Игнат (ID: 1602581828) начал регистрацию
+2025-07-21 16:51:04,634 - app.handlers - ИНФО - 📍 Пользователь Игнат ввел адрес: Чббчбч
+2025-07-21 16:51:09,604 - root - ОШИБКА - Ошибка в handle_photo: 'PhotoSize' object has no attribute 'download'
+Traceback (most recent call last):
+  File "c:\Users\G\PycharmProjects\Bot __v.1.7 betta_много_кнопок\app\handlers.py", line 200, in handle_photo
+    file = await photo.download(destination=BytesIO())
+                 ^^^^^^^^^^^^^^
+  File "C:\Users\G\PycharmProjects\Bot __v.1.7 betta_много_кнопок\.venv\Lib\site-packages\pydantic\main.py", line 891, in __getattr__
+    raise AttributeError(f'{type(self).__name__!r} object has no attribute {item!r}')
+AttributeError: 'PhotoSize' object has no attribute 'download'
+2025-07-21 16:59:16,314 - __main__ - ИНФО - 🎯 Запуск главного процесса бота на Windows
+2025-07-21 16:59:16,314 - __main__ - ИНФО - 📄 Файл лога: bot.log
+2025-07-21 16:59:17,250 - app.bot - ИНФО - 🚀 Бот запущен на Windows и готов к работе
+2025-07-21 16:59:17,250 - app.bot - ИНФО - 📄 Файл лога: bot.log
+2025-07-21 16:59:17,416 - app.bot - ИНФО - Админ-панель отправлена в группу -1002392016711
+2025-07-21 16:59:17,416 - app.bot - ИНФО - 📡 Запуск поллинга...
+2025-07-21 16:59:41,786 - app.handlers - ИНФО - 👤 Пользователь Игнат (ID: 1602581828) начал регистрацию
+2025-07-21 16:59:45,235 - app.handlers - ИНФО - 📍 Пользователь Игнат ввел адрес: Влвлвдввд
+2025-07-21 16:59:48,849 - root - ОШИБКА - Ошибка в handle_photo: 'File' object has no attribute 'download'
+Traceback (most recent call last):
+  File "c:\Users\G\PycharmProjects\Bot __v.1.7 betta_много_кнопок\app\handlers.py", line 204, in handle_photo
+    await file.download(destination=file_bytes)
+          ^^^^^^^^^^^^^
+  File "C:\Users\G\PycharmProjects\Bot __v.1.7 betta_много_кнопок\.venv\Lib\site-packages\pydantic\main.py", line 891, in __getattr__
+    raise AttributeError(f'{type(self).__name__!r} object has no attribute {item!r}')
+AttributeError: 'File' object has no attribute 'download'
