@@ -191,6 +191,21 @@ def sync_storage_to_both(request_id, request_data):
     except Exception as e:
         logger.error(f"Ошибка синхронизации заявки {request_id}: {str(e)}")
 
+def log_user_action(user_id: int, user_name: str, action: str, details: str = ""):
+    """Централизованное логирование действий пользователей"""
+    timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    log_message = f"[{timestamp}] 👤 {user_name} (ID: {user_id}) - {action}"
+    if details:
+        log_message += f" | {details}"
+    
+    logger.info(log_message)
+    
+    # Можно также сохранять в отдельный файл
+    try:
+        with open("user_actions.log", "a", encoding="utf-8") as f:
+            f.write(log_message + "\n")
+    except Exception as e:
+        logger.warning(f"Не удалось записать в user_actions.log: {str(e)}")
 
 
 
@@ -3546,8 +3561,96 @@ async def check_sync(message: Message):
         await message.answer(f"❌ Ошибка проверки: {str(e)}")
 
 
+@router.message(Command("broadcast"))
+async def broadcast_message(message: Message, state: FSMContext):
+    if message.from_user.id not in ADMINS:
+        await message.answer("❌ Эта команда доступна только администраторам")
+        return
+    
+    # Получаем текст после команды
+    text = message.text.replace("/broadcast", "").strip()
+    if not text:
+        await message.answer("📝 Использование: /broadcast <текст сообщения>")
+        return
+    
+    # Получаем всех активных пользователей
+    active_users = set()
+    for req_data in storage.values():
+        if isinstance(req_data, dict) and req_data.get("user_id"):
+            active_users.add(req_data["user_id"])
+    
+    sent_count = 0
+    for user_id in active_users:
+        try:
+            await message.bot.send_message(
+                chat_id=user_id,
+                text=f"📢 **Уведомление от администрации:**\n\n{text}"
+            )
+            sent_count += 1
+            await asyncio.sleep(0.1)  # Избегаем лимитов
+        except Exception as e:
+            logger.warning(f"Не удалось отправить сообщение пользователю {user_id}: {str(e)}")
+    
+    await message.answer(f"✅ Сообщение отправлено {sent_count} пользователям")
 
 
+@router.message(Command("monitor"))
+async def system_monitor(message: Message):
+    if message.from_user.id not in ADMINS:
+        await message.answer("❌ Эта команда доступна только администраторам")
+        return
+    
+    try:
+        import psutil
+        import os
+        
+        # Системная информация
+        cpu_percent = psutil.cpu_percent(interval=1)
+        memory = psutil.virtual_memory()
+        disk = psutil.disk_usage('/')
+        
+        # Информация о боте
+        process = psutil.Process(os.getpid())
+        bot_memory = process.memory_info().rss / 1024 / 1024  # MB
+        
+        monitor_text = f"🖥️ **Мониторинг системы:**\n\n"
+        monitor_text += f"💾 ОЗУ: {memory.percent}% ({memory.used // 1024 // 1024} MB / {memory.total // 1024 // 1024} MB)\n"
+        monitor_text += f"💽 Диск: {disk.percent}% ({disk.used // 1024 // 1024 // 1024} GB / {disk.total // 1024 // 1024 // 1024} GB)\n"
+        monitor_text += f"⚡ CPU: {cpu_percent}%\n\n"
+        monitor_text += f"🤖 **Бот:**\n"
+        monitor_text += f"📊 Память бота: {bot_memory:.1f} MB\n"
+        monitor_text += f"📝 Активных заявок: {len(storage)}\n"
+        monitor_text += f"🗄️ Размер БД: {os.path.getsize(db.db_path) // 1024} KB"
+        
+        await message.answer(monitor_text)
+        
+    except ImportError:
+        await message.answer("❌ Для мониторинга установите: pip install psutil")
+    except Exception as e:
+        await message.answer(f"❌ Ошибка мониторинга: {str(e)}")
+
+@router.message(Command("clear_redis"))
+async def clear_redis(message: Message):
+    if message.from_user.id not in ADMINS:
+        await message.answer("❌ Эта команда доступна только администраторам")
+        return
+    
+    try:
+        if redis_client is not None:
+            # Удаляем все ключи заявок
+            keys = redis_client.redis.keys("request:*")
+            if keys:
+                redis_client.redis.delete(*keys)
+            
+            # Очищаем список активных заявок
+            redis_client.redis.delete("active_requests")
+            
+            await message.answer(f"✅ Redis очищен. Удалено ключей: {len(keys)}")
+        else:
+            await message.answer("❌ Redis недоступен")
+    except Exception as e:
+        logger.error(f"Ошибка очистки Redis: {str(e)}")
+        await message.answer("❌ Ошибка очистки Redis")
 
 
 @router.message()
@@ -3573,29 +3676,6 @@ async def other_messages(message: Message, state: FSMContext):
 
     await message.reply("⚠️ Используй кнопки меню", reply_markup=kb.main)
 
-
-@router.message(Command("clear_redis"))
-async def clear_redis(message: Message):
-    if message.from_user.id not in ADMINS:
-        await message.answer("❌ Эта команда доступна только администраторам")
-        return
-    
-    try:
-        if redis_client is not None:
-            # Удаляем все ключи заявок
-            keys = redis_client.redis.keys("request:*")
-            if keys:
-                redis_client.redis.delete(*keys)
-            
-            # Очищаем список активных заявок
-            redis_client.redis.delete("active_requests")
-            
-            await message.answer(f"✅ Redis очищен. Удалено ключей: {len(keys)}")
-        else:
-            await message.answer("❌ Redis недоступен")
-    except Exception as e:
-        logger.error(f"Ошибка очистки Redis: {str(e)}")
-        await message.answer("❌ Ошибка очистки Redis")
 
 
 

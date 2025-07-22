@@ -51,6 +51,19 @@ replacement_type_kb = ReplyKeyboardMarkup(
     ],
     resize_keyboard=True
 )
+
+# Клавиатура для уведомлений администраторов
+admin_notification_kb = InlineKeyboardMarkup(inline_keyboard=[
+    [
+        InlineKeyboardButton(text="📊 Статистика", callback_data="quick_stats"),
+        InlineKeyboardButton(text="🔄 Обновить", callback_data="refresh_requests")
+    ],
+    [
+        InlineKeyboardButton(text="⚙️ Админ панель", callback_data="admin_panel")
+    ]
+])
+
+
 # Клавиатура выбора периода статистики
 stats_period_kb = InlineKeyboardMarkup(
     inline_keyboard=[
@@ -63,44 +76,13 @@ stats_period_kb = InlineKeyboardMarkup(
         ]
     ]
 )
-# Инлайн-клавиатуры для различных сценариев
-catalog1 = InlineKeyboardMarkup(
-    inline_keyboard=[
-        [InlineKeyboardButton(text='Сиреневый экран!', callback_data='ура мы дошли до регистрации!')],
-        [InlineKeyboardButton(text='Чёрный экран', callback_data='перегрузи')]
-    ]
-)
 
-catalog2 = InlineKeyboardMarkup(
-    inline_keyboard=[
-        [InlineKeyboardButton(text='нет', callback_data='проверяй светодиоды')],
-        [InlineKeyboardButton(text='да', callback_data='да конечно')],
-        [InlineKeyboardButton(text='а как он выглядит???', url='https://www.google.com')]
-    ]
-)
 
-catalog3 = InlineKeyboardMarkup(
-    inline_keyboard=[
-        [InlineKeyboardButton(text='проверил. она в порядке', callback_data='разбирайся')],
-        [InlineKeyboardButton(text='проверил. она не в порядке', callback_data='доставай')]
-    ]
-)
 
-catalog4 = InlineKeyboardMarkup(
-    inline_keyboard=[
-        [InlineKeyboardButton(
-            text='не знаю распиновку',
-            url='https://jeka.by/upload/userfiles/1/images/rj45%20%D0%BF%D0%BE%20%D1%86%D0%B2%D0%B5%D1%82%D0%B0%D0%BC.gif'
-        )]
-    ]
-)
 
-catalog5 = InlineKeyboardMarkup(
-    inline_keyboard=[
-        [InlineKeyboardButton(text='моргают', callback_data='убедись')],
-        [InlineKeyboardButton(text='НЕ моргают', callback_data='меняй провод')]
-    ]
-)
+
+
+
 
 # Полная клавиатура для модератора
 moderator_full = InlineKeyboardMarkup(
@@ -158,11 +140,7 @@ kb = {
     "cancel_kb": cancel_kb,
     "admin": admin_kb,
     "replacement_type_kb": replacement_type_kb,  # если есть
-    "catalog1": catalog1,
-    "catalog2": catalog2,
-    "catalog3": catalog3,
-    "catalog4": catalog4,
-    "catalog5": catalog5,
+
     "moderator_full": moderator_full,
     "check_connection_kb": check_connection_kb,
     "connection_result_kb": connection_result_kb,
