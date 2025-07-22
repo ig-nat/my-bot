@@ -18,13 +18,15 @@ cancel_kb = ReplyKeyboardMarkup(
 # Обновленная админская клавиатура с кнопками сброса
 admin_kb = ReplyKeyboardMarkup(
     keyboard=[
-        [KeyboardButton(text="📊 Статистика"), KeyboardButton(text="🔄 Обновить заявки")],
+        [KeyboardButton(text="📊 Статистика")],
+        [KeyboardButton(text="🔄 Обновить заявки"), KeyboardButton(text="🗑️ Очистить всё")],  # ← ДОБАВЬ
         [KeyboardButton(text="🔁 Сбросить пользователя"), KeyboardButton(text="⚠️ Сбросить всех")],
         [KeyboardButton(text="📄 Экспорт данных"), KeyboardButton(text="🧹 Очистка хранилища")],
         [KeyboardButton(text="🔙 Вернуться")]
     ],
     resize_keyboard=True
 )
+
 
 # Добавьте эту клавиатуру в ваш файл keyboards.py
 waiting_kb = ReplyKeyboardMarkup(

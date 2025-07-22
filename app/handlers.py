@@ -3629,28 +3629,104 @@ async def system_monitor(message: Message):
     except Exception as e:
         await message.answer(f"❌ Ошибка мониторинга: {str(e)}")
 
-@router.message(Command("clear_redis"))
-async def clear_redis(message: Message):
+@router.message(Command("clear_all"))
+async def clear_all_storages(message: Message):
     if message.from_user.id not in ADMINS:
         await message.answer("❌ Эта команда доступна только администраторам")
         return
     
+    # Запрашиваем подтверждение
+    confirm_kb = InlineKeyboardMarkup(inline_keyboard=[
+        [
+            InlineKeyboardButton(text="🗑️ ДА, ОЧИСТИТЬ ВСЁ", callback_data="confirm_clear_all"),
+            InlineKeyboardButton(text="❌ Отмена", callback_data="cancel_clear_all")
+        ]
+    ])
+    
+    await message.answer(
+        "⚠️ **ВНИМАНИЕ!** Вы уверены, что хотите очистить ВСЕ хранилища?\n\n"
+        "Это удалит:\n"
+        "🧠 Storage (оперативная память)\n"
+        "📡 Redis (кэш)\n"
+        "💾 Завершенные заявки из БД\n\n"
+        "❗ Активные заявки в БД останутся!",
+        reply_markup=confirm_kb
+    )
+
+@router.callback_query(F.data == "confirm_clear_all")
+async def confirm_clear_all_storages(callback: CallbackQuery):
+    if callback.from_user.id not in ADMINS:
+        await callback.answer("❌ Только для администраторов")
+        return
+    
     try:
+        results = []
+        
+        # 1. Очищаем Storage
+        storage_count = len(storage)
+        storage.clear()
+        results.append(f"🧠 Storage: очищено {storage_count} записей")
+        
+        # 2. Очищаем Redis
+        redis_count = 0
         if redis_client is not None:
-            # Удаляем все ключи заявок
-            keys = redis_client.redis.keys("request:*")
-            if keys:
-                redis_client.redis.delete(*keys)
-            
-            # Очищаем список активных заявок
-            redis_client.redis.delete("active_requests")
-            
-            await message.answer(f"✅ Redis очищен. Удалено ключей: {len(keys)}")
+            try:
+                # Получаем все ключи заявок
+                keys = redis_client.redis.keys("request:*")
+                if keys:
+                    redis_client.redis.delete(*keys)
+                    redis_count = len(keys)
+                
+                # Очищаем список активных заявок
+                redis_client.redis.delete("active_requests")
+                results.append(f"📡 Redis: очищено {redis_count} записей")
+            except Exception as e:
+                results.append(f"📡 Redis: ошибка - {str(e)}")
         else:
-            await message.answer("❌ Redis недоступен")
+            results.append("📡 Redis: не настроен")
+        
+        # 3. Очищаем завершенные заявки из БД
+        db_count = 0
+        try:
+            with sqlite3.connect(db.db_path) as conn:
+                cursor = conn.cursor()
+                cursor.execute("SELECT COUNT(*) FROM requests WHERE status = 'completed'")
+                db_count = cursor.fetchone()[0]
+                
+                cursor.execute("DELETE FROM requests WHERE status = 'completed'")
+                conn.commit()
+                
+            results.append(f"💾 БД: удалено {db_count} завершенных заявок")
+        except Exception as e:
+            results.append(f"💾 БД: ошибка - {str(e)}")
+        
+        # Формируем отчет
+        report = "✅ **Очистка завершена:**\n\n" + "\n".join(results)
+        
+        await callback.message.edit_text(report, reply_markup=None)
+        await callback.answer("✅ Все хранилища очищены")
+        
+        logger.info(f"🧹 Администратор {callback.from_user.full_name} очистил все хранилища")
+        
     except Exception as e:
-        logger.error(f"Ошибка очистки Redis: {str(e)}")
-        await message.answer("❌ Ошибка очистки Redis")
+        await callback.message.edit_text(f"❌ Ошибка очистки: {str(e)}", reply_markup=None)
+        await callback.answer("❌ Ошибка")
+
+@router.callback_query(F.data == "cancel_clear_all")
+async def cancel_clear_all_storages(callback: CallbackQuery):
+    await callback.message.edit_text("❌ Очистка всех хранилищ отменена", reply_markup=None)
+    await callback.answer("✅ Отменено")
+
+@router.message(F.text == "🗑️ Очистить всё")
+async def clear_all_button(message: Message):
+    if message.from_user.id not in ADMINS:
+        return
+    await clear_all_storages(message)
+
+
+
+
+
 
 
 @router.message()
