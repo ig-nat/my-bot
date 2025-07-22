@@ -37,23 +37,159 @@ logger = logging.getLogger(__name__)
 storage = {}
 
 
-#def restore_storage_from_redis():
-#    """Восстановление storage из Redis при запуске"""
-#    if redis_client is None:
-#        logger.info("🔄 Redis недоступен, заявки не восстанавливаются")
-#        return
-#        
-#    try:
-#        active_requests = redis_client.get_all_active_requests()
-#        storage.clear()
-#        storage.update(active_requests)
-#        logger.info(f"🔄 Восстановлено {len(active_requests)} заявок из Redis")
-#    except Exception as e:
-#        logger.error(f"Ошибка восстановления заявок из Redis: {str(e)}")
+def restore_storage_smart():
+    """Умное восстановление: Redis → БД → синхронизация"""
+    try:
+        # 1. Пробуем Redis
+        redis_data = {}
+        if redis_client is not None:
+            try:
+                redis_data = redis_client.get_all_active_requests()
+                logger.info(f"📡 Получено {len(redis_data)} заявок из Redis")
+            except Exception as e:
+                logger.warning(f"⚠️ Redis недоступен: {str(e)}")
+        else:
+            logger.info("📡 Redis не настроен")
+        
+        # 2. Получаем данные из БД
+        db_data = {}
+        try:
+            with sqlite3.connect(db.db_path) as conn:
+                cursor = conn.cursor()
+                cursor.execute('''
+                    SELECT request_id, user_id, user_name, address, request_type, gid, is_accepted 
+                    FROM requests 
+                    WHERE status != 'completed'
+                    ORDER BY created_at DESC
+                ''')
+                
+                for row in cursor.fetchall():
+                    request_id, user_id, user_name, address, request_type, gid, is_accepted = row
+                    db_data[int(request_id)] = {
+                        "user_id": user_id,
+                        "user_name": user_name,
+                        "adres": address,
+                        "request_type": request_type or "regular",
+                        "gid": gid or "",
+                        "is_accepted": bool(is_accepted),
+                        "is_completed": False,
+                        "source": "database"
+                    }
+            
+            logger.info(f"💾 Получено {len(db_data)} заявок из БД")
+        except Exception as e:
+            logger.error(f"Ошибка чтения БД: {str(e)}")
+        
+        # 3. Объединяем данные (Redis приоритетнее для активных операций)
+        storage.clear()
+        storage.update(db_data)      # Сначала БД (базовые данные)
+        
+        # Обновляем Redis данными (они могут быть более свежими)
+        for req_id, req_data in redis_data.items():
+            if req_id in storage:
+                # Объединяем данные: БД + Redis
+                storage[req_id].update(req_data)
+                storage[req_id]["source"] = "redis+database"
+            else:
+                # Только в Redis (возможно новая заявка)
+                storage[req_id] = req_data
+                storage[req_id]["source"] = "redis"
+        
+        logger.info(f"🔄 Восстановлено {len(storage)} заявок (Redis: {len(redis_data)}, БД: {len(db_data)})")
+        
+        # 4. Синхронизируем Redis с актуальными данными
+        if redis_client is not None and storage:
+            try:
+                # Сохраняем только активные заявки в Redis
+                active_requests = {k: v for k, v in storage.items() if not v.get("is_completed", False)}
+                redis_client.save_all_active_requests(active_requests)
+                logger.info(f"📡 Redis синхронизирован ({len(active_requests)} активных заявок)")
+            except Exception as e:
+                logger.warning(f"Не удалось синхронизировать Redis: {str(e)}")
+        
+    except Exception as e:
+        logger.error(f"Ошибка умного восстановления: {str(e)}")
 
-## Вызываем восстановление при импорте модуля
-#restore_storage_from_redis()
+# Вызываем умное восстановление при импорте модуля
+restore_storage_smart()
 
+
+def sync_storage_to_both(request_id, request_data):
+    """Синхронизация заявки в Redis И БД"""
+    try:
+        # 1. Обновляем в Redis (быстро)
+        if redis_client is not None:
+            try:
+                redis_client.save_request(str(request_id), request_data)
+                logger.debug(f"📡 Заявка {request_id} синхронизирована в Redis")
+            except Exception as e:
+                logger.warning(f"Не удалось сохранить заявку {request_id} в Redis: {str(e)}")
+        
+        # 2. Обновляем в БД (надежно) - если данные полные
+        if request_data.get("user_id") and request_data.get("user_name"):
+            try:
+                # Сохраняем базовую информацию
+                db.save_request(
+                    request_id=str(request_id),
+                    user_id=request_data.get("user_id"),
+                    user_name=request_data.get("user_name"),
+                    address=request_data.get("adres", ""),
+                    request_type=request_data.get("request_type", "regular")
+                )
+                
+                # Обновляем GiD если есть
+                if request_data.get("gid"):
+                    db.update_request_gid(str(request_id), request_data.get("gid"))
+                
+                # Обновляем статус если завершена
+                if request_data.get("is_completed"):
+                    db.update_request_status(str(request_id), "completed", "system")
+                
+                logger.debug(f"💾 Заявка {request_id} синхронизирована в БД")
+            except Exception as e:
+                logger.warning(f"Не удалось сохранить заявку {request_id} в БД: {str(e)}")
+        
+    except Exception as e:
+        logger.error(f"Ошибка синхронизации заявки {request_id}: {str(e)}")
+
+
+def sync_storage_to_both(request_id, request_data):
+    """Синхронизация заявки в Redis И БД"""
+    try:
+        # 1. Обновляем в Redis (быстро)
+        if redis_client is not None:
+            try:
+                redis_client.save_request(str(request_id), request_data)
+                logger.debug(f"📡 Заявка {request_id} синхронизирована в Redis")
+            except Exception as e:
+                logger.warning(f"Не удалось сохранить заявку {request_id} в Redis: {str(e)}")
+        
+        # 2. Обновляем в БД (надежно) - если данные полные
+        if request_data.get("user_id") and request_data.get("user_name"):
+            try:
+                # Сохраняем базовую информацию
+                db.save_request(
+                    request_id=str(request_id),
+                    user_id=request_data.get("user_id"),
+                    user_name=request_data.get("user_name"),
+                    address=request_data.get("adres", ""),
+                    request_type=request_data.get("request_type", "regular")
+                )
+                
+                # Обновляем GiD если есть
+                if request_data.get("gid"):
+                    db.update_request_gid(str(request_id), request_data.get("gid"))
+                
+                # Обновляем статус если завершена
+                if request_data.get("is_completed"):
+                    db.update_request_status(str(request_id), "completed", "system")
+                
+                logger.debug(f"💾 Заявка {request_id} синхронизирована в БД")
+            except Exception as e:
+                logger.warning(f"Не удалось сохранить заявку {request_id} в БД: {str(e)}")
+        
+    except Exception as e:
+        logger.error(f"Ошибка синхронизации заявки {request_id}: {str(e)}")
 
 
 
@@ -1196,7 +1332,12 @@ async def tv_final_step(message: Message, state: FSMContext):
 
         group_message_id = data.get("group_message_id")
         adres = data.get("adres")
-        city = storage_data.get("city", "Город не указан")  # ← ДОБАВЬ
+        storage_data = storage.get(group_message_id)
+        if not storage_data:
+            await message.answer("⚠️ Заявка не найдена")
+            return
+
+        city = storage_data.get("city", "Город не указан")
 
         if not group_message_id or not adres:
             raise ValueError("ID сообщения в группе или адрес отсутствует")
@@ -1371,6 +1512,7 @@ async def save_photo3(message: Message, state: FSMContext):
         return
 
     if message.content_type == ContentType.PHOTO:
+        # Проверяем, что отправлено только одно фото
         if hasattr(message, 'media_group_id') and message.media_group_id:
             await message.answer("📸 Пожалуйста, отправляйте фотографии по одной, а не группой.")
             return
@@ -1402,9 +1544,11 @@ async def save_photo3(message: Message, state: FSMContext):
                 InputMediaPhoto(media=photo3, caption=f"Серийник ПК от {user_name}")
             ]
 
+            # Используем безопасную отправку медиа-группы
             sent_messages = await safe_send_media_group(message.bot, GROUP_ID, media)
             media_group_ids = [msg.message_id for msg in sent_messages]
 
+            # Отправляем сообщение с кнопками
             button_message = await send_message_with_retry(
                 message.bot,
                 chat_id=GROUP_ID,
@@ -1415,7 +1559,6 @@ async def save_photo3(message: Message, state: FSMContext):
 
             # Сохраняем информацию о заявке с адресом И городом
             storage[media_group_ids[0]] = {
-                
                 "user_id": message.from_user.id,
                 "user_name": user_name,
                 "button_message_id": button_message.message_id,
@@ -1425,10 +1568,19 @@ async def save_photo3(message: Message, state: FSMContext):
                 "adres": adres,
                 "city": city  # ← ДОБАВИЛИ ГОРОД В STORAGE
             }
-
-
+            
+            # Синхронизируем с Redis и БД
+            try:
+                sync_storage_to_both(media_group_ids[0], storage[media_group_ids[0]])
+            except Exception as e:
+                logger.warning(f"Ошибка синхронизации: {str(e)}")
+            
+            # Дополнительно сохраняем в Redis (если доступен)
             if redis_client is not None:
-                redis_client.save_request(str(media_group_ids[0]), storage[media_group_ids[0]])
+                try:
+                    redis_client.save_request(str(media_group_ids[0]), storage[media_group_ids[0]])
+                except Exception as e:
+                    logger.warning(f"Ошибка сохранения в Redis: {str(e)}")
             else:
                 logger.debug("Redis недоступен, заявка не сохранена в Redis")
 
@@ -1825,6 +1977,9 @@ async def handle_gid(message: Message, state: FSMContext):
         # Обновляем статус заявки
         storage[group_message_id]["is_accepted"] = True
         storage[group_message_id]["gid"] = message.text
+        # Синхронизируем изменения
+        sync_storage_to_both(group_message_id, storage[group_message_id])
+
         if redis_client is not None:
             redis_client.update_request(str(group_message_id), {
 
@@ -2245,6 +2400,143 @@ async def cleanup_storage(message: Message):
     except Exception as e:
         logger.error(f"Ошибка при очистке хранилища: {str(e)}")
         await message.answer("❌ Ошибка при очистке хранилища")
+
+
+
+
+
+# ========== КОМАНДЫ СИНХРОНИЗАЦИИ REDIS ==========
+
+@router.message(Command("sync_force"))
+async def force_sync(message: Message):
+    if message.from_user.id not in ADMINS:
+        await message.answer("❌ Эта команда доступна только администраторам")
+        return
+    
+    try:
+        await message.answer("🔄 Начинаю принудительную синхронизацию...")
+        
+        # 1. Получаем данные из БД
+        db_data = {}
+        with sqlite3.connect(db.db_path) as conn:
+            cursor = conn.cursor()
+            cursor.execute('''
+                SELECT request_id, user_id, user_name, address, request_type, gid, is_accepted 
+                FROM requests 
+                WHERE status != 'completed'
+                ORDER BY created_at DESC
+            ''')
+            
+            for row in cursor.fetchall():
+                request_id, user_id, user_name, address, request_type, gid, is_accepted = row
+                db_data[int(request_id)] = {
+                    "user_id": user_id,
+                    "user_name": user_name,
+                    "adres": address,
+                    "request_type": request_type or "regular",
+                    "gid": gid or "",
+                    "is_accepted": bool(is_accepted),
+                    "is_completed": False
+                }
+        
+        # 2. Обновляем storage
+        storage.clear()
+        storage.update(db_data)
+        
+        # 3. Синхронизируем с Redis
+        redis_synced = 0
+        if redis_client is not None:
+            try:
+                # Загружаем актуальные данные
+                for req_id, req_data in storage.items():
+                    redis_client.save_request(str(req_id), req_data)
+                    redis_synced += 1
+                    
+            except Exception as e:
+                await message.answer(f"⚠️ Ошибка синхронизации с Redis: {str(e)}")
+        
+        await message.answer(
+            f"✅ **Принудительная синхронизация завершена:**\n\n"
+            f"💾 Загружено из БД: {len(db_data)} заявок\n"
+            f"🧠 Обновлено в Storage: {len(storage)} заявок\n"
+            f"📡 Синхронизировано в Redis: {redis_synced} заявок"
+        )
+        
+    except Exception as e:
+        logger.error(f"Ошибка принудительной синхронизации: {str(e)}")
+        await message.answer(f"❌ Ошибка синхронизации: {str(e)}")
+
+
+@router.message(Command("redis_clear"))
+async def clear_redis(message: Message):
+    if message.from_user.id not in ADMINS:
+        await message.answer("❌ Эта команда доступна только администраторам")
+        return
+    
+    try:
+        if redis_client is None:
+            await message.answer("❌ Redis не настроен")
+            return
+        
+        # Запрашиваем подтверждение
+        confirm_kb = InlineKeyboardMarkup(inline_keyboard=[
+            [
+                InlineKeyboardButton(text="✅ Да, очистить Redis", callback_data="confirm_redis_clear"),
+                InlineKeyboardButton(text="❌ Отмена", callback_data="cancel_redis_clear")
+            ]
+        ])
+        
+        await message.answer(
+            "⚠️ **ВНИМАНИЕ!** Вы уверены, что хотите очистить Redis?\n\n"
+            "Это удалит все активные заявки из Redis (но НЕ из БД).\n"
+            "После очистки используйте `/sync_force` для восстановления.",
+            reply_markup=confirm_kb
+        )
+        
+    except Exception as e:
+        await message.answer(f"❌ Ошибка: {str(e)}")
+
+
+@router.message(Command("redis_info"))
+async def redis_info(message: Message):
+    if message.from_user.id not in ADMINS:
+        await message.answer("❌ Эта команда доступна только администраторам")
+        return
+    
+    try:
+        if redis_client is None:
+            await message.answer("❌ Redis не настроен")
+            return
+        
+        # Получаем информацию о Redis
+        try:
+            redis_data = redis_client.get_all_active_requests()
+            redis_keys = len(redis_data)
+            status = "🟢 Подключен"
+            
+        except Exception as e:
+            redis_keys = "Недоступно"
+            status = f"🔴 Ошибка: {str(e)}"
+        
+        await message.answer(
+            f"📡 **Информация о Redis:**\n\n"
+            f"Статус: {status}\n"
+            f"Активных заявок: {redis_keys}\n"
+            f"Storage заявок: {len(storage)}\n\n"
+            f"**Команды управления:**\n"
+            f"• `/redis_clear` - очистить Redis\n"
+            f"• `/sync_force` - принудительная синхронизация\n"
+            f"• `/sync_check` - проверка синхронизации"
+        )
+        
+    except Exception as e:
+        await message.answer(f"❌ Ошибка получения информации: {str(e)}")
+
+
+
+
+
+
 
 
 
@@ -3133,6 +3425,37 @@ async def contact_user(callback: CallbackQuery):
 
 
 
+# ========== CALLBACK ОБРАБОТЧИКИ ДЛЯ REDIS ==========
+
+@router.callback_query(F.data == "confirm_redis_clear")
+async def confirm_redis_clear(callback: CallbackQuery):
+    if callback.from_user.id not in ADMINS:
+        await callback.answer("❌ Только для администраторов")
+        return
+    
+    try:
+        if redis_client is not None:
+            # Очищаем Redis (если есть метод clear_all_requests)
+            try:
+                redis_client.clear_all_requests()
+                await callback.message.edit_text("✅ Redis очищен успешно!")
+            except AttributeError:
+                # Если метода нет, используем альтернативный способ
+                await callback.message.edit_text("⚠️ Метод очистки Redis недоступен. Используйте /sync_force")
+        else:
+            await callback.message.edit_text("❌ Redis недоступен")
+            
+        await callback.answer("✅ Redis очищен")
+        
+    except Exception as e:
+        await callback.message.edit_text(f"❌ Ошибка очистки Redis: {str(e)}")
+        await callback.answer("❌ Ошибка")
+
+
+@router.callback_query(F.data == "cancel_redis_clear")
+async def cancel_redis_clear(callback: CallbackQuery):
+    await callback.message.edit_text("❌ Очистка Redis отменена")
+    await callback.answer("✅ Отменено")
 
 
 
@@ -3164,6 +3487,48 @@ async def cancel(message: Message, state: FSMContext):
     except Exception as e:
         logger.error(f"Ошибка при отмене: {str(e)}", exc_info=True)
         await message.answer("❌ Ошибка при отмене. Попробуйте еще раз.")
+
+
+
+@router.message(Command("sync_check"))
+async def check_sync(message: Message):
+    if message.from_user.id not in ADMINS:
+        await message.answer("❌ Эта команда доступна только администраторам")
+        return
+    
+    try:
+        redis_count = 0
+        db_count = 0
+        
+        # Считаем Redis
+        if redis_client is not None:
+            try:
+                redis_data = redis_client.get_all_active_requests()
+                redis_count = len(redis_data)
+            except:
+                redis_count = "Недоступен"
+        
+        # Считаем БД
+        try:
+            with sqlite3.connect(db.db_path) as conn:
+                cursor = conn.cursor()
+                cursor.execute('SELECT COUNT(*) FROM requests WHERE status != "completed"')
+                db_count = cursor.fetchone()[0]
+        except Exception as e:
+            db_count = f"Ошибка: {str(e)}"
+        
+        await message.answer(
+            f"🔄 **Проверка синхронизации:**\n\n"
+            f"📡 Redis: {redis_count} заявок\n"
+            f"💾 БД: {db_count} заявок\n"
+            f"🧠 Storage: {len(storage)} заявок\n\n"
+            f"ℹ️ Используйте /sync_force для принудительной синхронизации"
+        )
+        
+    except Exception as e:
+        await message.answer(f"❌ Ошибка проверки: {str(e)}")
+
+
 
 
 
@@ -3214,6 +3579,7 @@ async def clear_redis(message: Message):
     except Exception as e:
         logger.error(f"Ошибка очистки Redis: {str(e)}")
         await message.answer("❌ Ошибка очистки Redis")
+
 
 
 
