@@ -1098,7 +1098,6 @@ async def ops_final_step(message: Message, state: FSMContext):
 
         group_message_id = data.get("group_message_id")
         adres = data.get("adres")
-        city = storage_data.get("city", "Город не указан")  # ← ДОБАВЬ
 
         if not group_message_id or not adres:
             raise ValueError("ID сообщения в группе или адрес отсутствует")
@@ -1108,12 +1107,20 @@ async def ops_final_step(message: Message, state: FSMContext):
             await state.clear()
             return
             
+        # ИСПРАВЛЕНИЕ: Получаем storage_data ПЕРЕД использованием
         storage_data = storage.get(group_message_id)
         if not storage_data or not storage_data.get("is_accepted", False):
             await message.answer("⏳ Заявка еще не одобрена. Ожидайте!")
             return
 
+        # Теперь можно безопасно использовать storage_data
+        city = storage_data.get("city", "Город не указан")
         gid = storage_data.get("gid", "GiD не указан")
+        
+        # ... остальной код функции ...
+
+
+        
         
         photo_id = message.photo[-1].file_id
         user_name = message.from_user.full_name
@@ -2055,13 +2062,14 @@ async def final_step(message: Message, state: FSMContext):
 
         # Сохраняем информацию о финальной заявке
         storage[sent_message.message_id] = {
-            "user_id": message.from_user.id,
+            "user_id": callback.from_user.id,  # ← Используй callback
             "group_message_id": group_message_id,
             "is_accepted": True,
-            "user_name": user_name,
-            "adres": adres,
-            "gid": gid
+            "user_name": callback.from_user.full_name,  # ← Используй callback
+            "adres": storage[group_message_id].get("adres", ""),  # ← Берем из существующих данных
+            "gid": storage[group_message_id].get("gid", "")  # ← Берем из существующих данных
         }
+
 
         # ВАЖНО: Помечаем, что финальное фото отправлено
         await state.update_data(final_photo_sent=True, final_message_id=sent_message.message_id)
@@ -2837,7 +2845,7 @@ async def connection_restored(callback: CallbackQuery):
             redis_client.update_request(str(group_message_id), {
 
         "is_accepted": True,
-           "gid": message.text
+           
         })
         
         # ИСПРАВЛЕНИЕ: Безопасно удаляем предыдущие статусные сообщения
