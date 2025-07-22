@@ -1156,7 +1156,7 @@ async def save_tv_photo(message: Message, state: FSMContext):
 
     if message.content_type == ContentType.PHOTO:
         logger.info(f"📸 Получено фото от {message.from_user.full_name}")
-
+        
         if hasattr(message, 'media_group_id') and message.media_group_id:
             await message.answer("📸 Пожалуйста, отправляйте фотографии по одной, а не группой.")
             return
@@ -1164,6 +1164,7 @@ async def save_tv_photo(message: Message, state: FSMContext):
         try:
             data = await state.get_data()
             logger.info(f"🔍 Данные состояния: {data}")
+            
             tv_photo = message.photo[-1].file_id
             adres = data.get('adres')
             city = data.get('city', '')  # Получаем город если есть
@@ -1198,7 +1199,7 @@ async def save_tv_photo(message: Message, state: FSMContext):
                 "city": city,
                 "replacement_type": "TV",
                 "is_completed": False
-            }
+            }  # ← ДОБАВЬ ЭТУ ЗАКРЫВАЮЩУЮ СКОБКУ!
             
             # Синхронизируем с Redis и БД
             try:
@@ -1232,6 +1233,7 @@ async def save_tv_photo(message: Message, state: FSMContext):
             await state.clear()
     else:
         await message.answer("📸 Пожалуйста, отправьте фото серийного номера телевизора.")
+
 
 
 # Обработчик финального фото для замены OPS
