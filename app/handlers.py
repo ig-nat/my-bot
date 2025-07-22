@@ -2062,13 +2062,15 @@ async def final_step(message: Message, state: FSMContext):
 
         # Сохраняем информацию о финальной заявке
         storage[sent_message.message_id] = {
-            "user_id": callback.from_user.id,  # ← Используй callback
+            "user_id": message.from_user.id,  # ← ПРАВИЛЬНО
             "group_message_id": group_message_id,
             "is_accepted": True,
-            "user_name": callback.from_user.full_name,  # ← Используй callback
-            "adres": storage[group_message_id].get("adres", ""),  # ← Берем из существующих данных
-            "gid": storage[group_message_id].get("gid", "")  # ← Берем из существующих данных
+            "user_name": user_name,
+            "adres": adres,
+            "gid": gid
         }
+
+
 
 
         # ВАЖНО: Помечаем, что финальное фото отправлено
