@@ -2328,15 +2328,26 @@ async def accept_final_photo(callback: CallbackQuery, state: FSMContext):
                 redis_client.complete_request(str(group_message_id))
 
         storage[final_message_id]["moderator_name"] = moderator_name
+        storage[final_message_id]["is_completed"] = True  # ← ДОБАВЬ ЭТУ СТРОКУ!
+        
+        # Обновляем БД для финального фото
         db.update_request_status(
-            str(final_message_id), 
-            "completed", 
+            str(final_message_id),
+            "completed",
             moderator_name
         )
 
+        # ✅ ГЛАВНОЕ ИСПРАВЛЕНИЕ: Обновляем основную заявку в БД
         if group_message_id and group_message_id in storage:
             storage[group_message_id]["is_completed"] = True
             storage[group_message_id]["moderator_name"] = moderator_name
+            
+            # ← ДОБАВЬ ЭТУ СТРОКУ!
+            db.update_request_status(
+                str(group_message_id),
+                "completed", 
+                moderator_name
+            )
             
             # Пытаемся удалить сообщение с кнопками в основной группе
             try:
