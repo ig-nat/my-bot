@@ -1143,32 +1143,43 @@ async def save_tv_adres(message: Message, state: FSMContext):
     await state.set_state(TvReplacement.tv_photo)
     await message.answer("✅ Адрес сохранён! Отправьте фото серийного номера телевизора", reply_markup=kb.cancel_kb)
 
+
+
 @router.message(TvReplacement.tv_photo)
 async def save_tv_photo(message: Message, state: FSMContext):
+    logger.info(f"🔧 Пользователь {message.from_user.full_name} отправил фото для замены ТВ")
+    
     if message.text == "❌ Отмена":
         await state.clear()
         await message.answer("❎ Замена оборудования отменена", reply_markup=kb.main)
         return
 
     if message.content_type == ContentType.PHOTO:
+        logger.info(f"📸 Получено фото от {message.from_user.full_name}")
+
         if hasattr(message, 'media_group_id') and message.media_group_id:
             await message.answer("📸 Пожалуйста, отправляйте фотографии по одной, а не группой.")
             return
         
         try:
             data = await state.get_data()
+            logger.info(f"🔍 Данные состояния: {data}")
             tv_photo = message.photo[-1].file_id
             adres = data.get('adres')
+            city = data.get('city', '')  # Получаем город если есть
             user_name = message.from_user.full_name
 
             if not adres:
                 raise ValueError("Адрес не получен")
 
+            # Формируем полный адрес
+            full_address = f"{city}, {adres}" if city else adres
+
             # Отправляем сразу в GROUP_ID_2 (минуя GROUP_ID)
             await send_message_with_retry(
                 message.bot,
                 chat_id=GROUP_ID_2,
-                text=f"📺 **ЗАМЕНА ТЕЛЕВИЗОРА** 📺\nОтправитель: {user_name}\nАдрес: {adres}"
+                text=f"📺 **ЗАМЕНА ТЕЛЕВИЗОРА** 📺\nОтправитель: {user_name}\nАдрес: {full_address}"
             )
 
             # Отправляем фото серийного номера телевизора
@@ -1184,22 +1195,25 @@ async def save_tv_photo(message: Message, state: FSMContext):
                 "user_name": user_name,
                 "is_accepted": True,  # Сразу принята
                 "adres": adres,
-                "replacement_type": "TV"
+                "city": city,
+                "replacement_type": "TV",
+                "is_completed": False
             }
-            if redis_client is not None:
-                redis_client.save_request(str(media_group_ids[0]), storage[media_group_ids[0]])
-            else:
-                logger.debug("Redis недоступен, заявка не сохранена в Redis")
-
+            
+            # Синхронизируем с Redis и БД
+            try:
+                sync_storage_to_both(sent_message.message_id, storage[sent_message.message_id])
+            except Exception as e:
+                logger.warning(f"Ошибка синхронизации замены ТВ: {str(e)}")
+            
             # Сохраняем в базу данных
             db.save_request(
                 request_id=str(sent_message.message_id),
                 user_id=message.from_user.id,
                 user_name=user_name,
-                address=adres,
+                address=full_address,
                 request_type="TV"
             )
-
 
             # Сразу переходим к финальному фото
             await message.answer(
@@ -1210,7 +1224,7 @@ async def save_tv_photo(message: Message, state: FSMContext):
             await state.update_data(group_message_id=sent_message.message_id)
             await state.set_state(TvReplacement.final_photo)
 
-            logger.info(f"📝 Заявка на замену телевизора от {user_name} отправлена в GROUP_ID_2 с адресом: {adres}")
+            logger.info(f"📝 Заявка на замену телевизора от {user_name} отправлена в GROUP_ID_2 с адресом: {full_address}")
 
         except Exception as e:
             logger.error(f"Ошибка при отправке данных замены телевизора: {str(e)}", exc_info=True)
@@ -1218,6 +1232,7 @@ async def save_tv_photo(message: Message, state: FSMContext):
             await state.clear()
     else:
         await message.answer("📸 Пожалуйста, отправьте фото серийного номера телевизора.")
+
 
 # Обработчик финального фото для замены OPS
 @router.message(OpsReplacement.final_photo)
