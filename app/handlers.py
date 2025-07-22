@@ -37,18 +37,23 @@ logger = logging.getLogger(__name__)
 storage = {}
 
 
-def restore_storage_from_redis():
-    """Восстановление storage из Redis при запуске"""
-    try:
-        active_requests = redis_client.get_all_active_requests()
-        storage.clear()
-        storage.update(active_requests)
-        logger.info(f"🔄 Восстановлено {len(active_requests)} заявок из Redis")
-    except Exception as e:
-        logger.error(f"Ошибка восстановления заявок из Redis: {str(e)}")
+#def restore_storage_from_redis():
+#    """Восстановление storage из Redis при запуске"""
+#    if redis_client is None:
+#        logger.info("🔄 Redis недоступен, заявки не восстанавливаются")
+#        return
+#        
+#    try:
+#        active_requests = redis_client.get_all_active_requests()
+#        storage.clear()
+#        storage.update(active_requests)
+#        logger.info(f"🔄 Восстановлено {len(active_requests)} заявок из Redis")
+#    except Exception as e:
+#        logger.error(f"Ошибка восстановления заявок из Redis: {str(e)}")
 
-# Вызываем восстановление при импорте модуля
-restore_storage_from_redis()
+## Вызываем восстановление при импорте модуля
+#restore_storage_from_redis()
+
 
 
 
@@ -954,8 +959,10 @@ async def save_ops_screen_photo(message: Message, state: FSMContext):
                 "replacement_type": "OPS"  # Добавляем тип замены
             }
 
-            redis_client.save_request(str(media_group_ids[0]), storage[media_group_ids[0]])
-
+            if redis_client is not None:
+                redis_client.save_request(str(media_group_ids[0]), storage[media_group_ids[0]])
+            else:
+                logger.debug("Redis недоступен, заявка не сохранена в Redis")
             # Сохраняем в базу данных
             db.save_request(
                 request_id=str(media_group_ids[0]),
@@ -1043,8 +1050,10 @@ async def save_tv_photo(message: Message, state: FSMContext):
                 "adres": adres,
                 "replacement_type": "TV"
             }
-            redis_client.save_request(str(media_group_ids[0]), storage[media_group_ids[0]])
-
+            if redis_client is not None:
+                redis_client.save_request(str(media_group_ids[0]), storage[media_group_ids[0]])
+            else:
+                logger.debug("Redis недоступен, заявка не сохранена в Redis")
 
             # Сохраняем в базу данных
             db.save_request(
@@ -1411,8 +1420,10 @@ async def save_photo3(message: Message, state: FSMContext):
             }
 
 
-            redis_client.save_request(str(media_group_ids[0]), storage[media_group_ids[0]])
-
+            if redis_client is not None:
+                redis_client.save_request(str(media_group_ids[0]), storage[media_group_ids[0]])
+            else:
+                logger.debug("Redis недоступен, заявка не сохранена в Redis")
 
             # Сохраняем в базу данных
             db.save_request(
@@ -1807,7 +1818,9 @@ async def handle_gid(message: Message, state: FSMContext):
         # Обновляем статус заявки
         storage[group_message_id]["is_accepted"] = True
         storage[group_message_id]["gid"] = message.text
-        redis_client.update_request(str(group_message_id), {
+        if redis_client is not None:
+            redis_client.update_request(str(group_message_id), {
+
         "is_accepted": True,
         "gid": message.text
     })
@@ -2112,9 +2125,11 @@ async def accept_final_photo(callback: CallbackQuery, state: FSMContext):
         )
         
         # Помечаем заявку как завершенную
-        redis_client.complete_request(str(final_message_id))
-        if group_message_id:
-            redis_client.complete_request(str(group_message_id))
+        if redis_client is not None:
+            redis_client.complete_request(str(final_message_id))
+            if group_message_id:
+                redis_client.complete_request(str(group_message_id))
+
         storage[final_message_id]["moderator_name"] = moderator_name
         db.update_request_status(
             str(final_message_id), 
@@ -2818,7 +2833,9 @@ async def connection_restored(callback: CallbackQuery):
         # Обновляем статус заявки
         storage[group_message_id]["is_accepted"] = True
         storage[group_message_id]["gid"] = message.text
-        redis_client.update_request(str(group_message_id), {
+        if redis_client is not None:
+            redis_client.update_request(str(group_message_id), {
+
         "is_accepted": True,
            "gid": message.text
         })
@@ -3173,6 +3190,28 @@ async def other_messages(message: Message, state: FSMContext):
     await message.reply("⚠️ Используй кнопки меню", reply_markup=kb.main)
 
 
+@router.message(Command("clear_redis"))
+async def clear_redis(message: Message):
+    if message.from_user.id not in ADMINS:
+        await message.answer("❌ Эта команда доступна только администраторам")
+        return
+    
+    try:
+        if redis_client is not None:
+            # Удаляем все ключи заявок
+            keys = redis_client.redis.keys("request:*")
+            if keys:
+                redis_client.redis.delete(*keys)
+            
+            # Очищаем список активных заявок
+            redis_client.redis.delete("active_requests")
+            
+            await message.answer(f"✅ Redis очищен. Удалено ключей: {len(keys)}")
+        else:
+            await message.answer("❌ Redis недоступен")
+    except Exception as e:
+        logger.error(f"Ошибка очистки Redis: {str(e)}")
+        await message.answer("❌ Ошибка очистки Redis")
 
 
 
