@@ -5,3 +5,158 @@
 2025-07-22 03:01:49,574 - app.bot - ИНФО - 📄 Файл лога: bot.log
 2025-07-22 03:01:49,682 - app.bot - ИНФО - Админ-панель отправлена в группу -1002392016711
 2025-07-22 03:01:49,683 - app.bot - ИНФО - 📡 Запуск поллинга...
+2025-07-22 10:26:25,772 - app.handlers - ИНФО - 👤 Пользователь Кириленко Максим (ID: 761087056) начал замену оборудования
+2025-07-22 10:26:31,121 - app.handlers - ИНФО - 👤 Пользователь Кириленко Максим выбрал замену телевизора
+2025-07-22 10:26:33,608 - app.handlers - ИНФО - 👤 Пользователь Игнат (ID: 1602581828) начал регистрацию
+2025-07-22 10:26:38,007 - app.handlers - ИНФО - 🏙️ Пользователь Кириленко Максим ввел город для замены TV: цукецу
+2025-07-22 10:26:41,082 - app.handlers - ИНФО - 🏙️ Пользователь Игнат ввел город: Город
+2025-07-22 10:26:43,167 - app.handlers - ИНФО - 📍 Пользователь Кириленко Максим ввел адрес для замены телевизора: ыавпвр
+2025-07-22 10:26:46,059 - app.handlers - ИНФО - 📍 Пользователь Игнат ввел адрес: Адрес
+2025-07-22 10:26:50,835 - app.handlers - ИНФО - 📸 Первое фото сохранено: c:\Users\G\PycharmProjects\Bot __v.1.7 betta_много_кнопок\app\photos\757cae0c-18c3-4c39-b182-38a07f236c6f.jpg
+2025-07-22 10:26:52,076 - app.handlers - ОШИБКА - Ошибка при отправке данных замены телевизора: name 'media_group_ids' is not defined
+Traceback (most recent call last):
+  File "c:\Users\G\PycharmProjects\Bot __v.1.7 betta_много_кнопок\app\handlers.py", line 1054, in save_tv_photo
+    redis_client.save_request(str(media_group_ids[0]), storage[media_group_ids[0]])
+                                  ^^^^^^^^^^^^^^^
+NameError: name 'media_group_ids' is not defined
+2025-07-22 10:26:53,215 - app.handlers - ИНФО - 📸 Второе фото сохранено: c:\Users\G\PycharmProjects\Bot __v.1.7 betta_много_кнопок\app\photos\a0905793-8e85-490c-897b-661bf33823af.jpg
+2025-07-22 10:26:57,264 - app.database - ИНФО - Заявка 8182 сохранена в БД с фото: 
+2025-07-22 10:26:57,449 - app.handlers - ИНФО - 📝 Заявка от Игнат создана с городом: Город, адресом: Адрес
+2025-07-22 10:28:08,856 - app.handlers - ИНФО - 👤 Пользователь Кириленко Максим (ID: 761087056) начал замену оборудования
+2025-07-22 10:28:14,442 - app.handlers - ИНФО - 👤 Пользователь Кириленко Максим выбрал замену OPS
+2025-07-22 10:28:17,374 - app.handlers - ИНФО - 🏙️ Пользователь Кириленко Максим ввел город для замены OPS: вапро
+2025-07-22 10:28:20,562 - app.handlers - ИНФО - 📍 Пользователь Кириленко Максим ввел адрес для замены OPS: укенг
+2025-07-22 10:28:34,974 - app.database - ИНФО - Заявка 8187 сохранена в БД с фото: 
+2025-07-22 10:28:34,982 - app.database - ИНФО - Заявка 8187 сохранена в БД с фото: 
+2025-07-22 10:28:35,092 - app.handlers - ИНФО - 📝 Заявка на замену OPS от Кириленко Максим создана с адресом: укенг
+2025-07-22 10:29:40,525 - app.handlers - ИНФО - 👤 Пользователь Катя 2 (ID: 8109986113) начал регистрацию
+2025-07-22 10:29:46,494 - app.handlers - ОШИБКА - Ошибка отправки сообщения: Telegram server says - Bad Request: message to be replied not found
+2025-07-22 10:29:47,590 - app.handlers - ОШИБКА - Ошибка отправки сообщения: Telegram server says - Bad Request: message to be replied not found
+2025-07-22 10:29:48,253 - app.handlers - ИНФО - 🏙️ Пользователь Катя 2 ввел город: Балашиха
+2025-07-22 10:29:48,689 - app.handlers - ОШИБКА - Ошибка отправки сообщения: Telegram server says - Bad Request: message to be replied not found
+2025-07-22 10:29:49,807 - app.handlers - ОШИБКА - Ошибка отправки сообщения: Telegram server says - Bad Request: message to be replied not found
+2025-07-22 10:29:50,912 - app.handlers - ОШИБКА - Ошибка отправки сообщения: Telegram server says - Bad Request: message to be replied not found
+2025-07-22 10:29:50,913 - app.handlers - ПРЕДУПРЕЖДЕНИЕ - Не удалось отправить с привязкой к сообщению 1640, отправляем без привязки: Telegram server says - Bad Request: message to be replied not found
+2025-07-22 10:29:54,872 - app.handlers - ИНФО - 📍 Пользователь Катя 2 ввел адрес: Алалал
+2025-07-22 10:29:59,770 - app.handlers - ОШИБКА - Ошибка при восстановлении связи: name 'message' is not defined
+Traceback (most recent call last):
+  File "c:\Users\G\PycharmProjects\Bot __v.1.7 betta_много_кнопок\app\handlers.py", line 2835, in connection_restored
+    storage[group_message_id]["gid"] = message.text
+                                       ^^^^^^^
+NameError: name 'message' is not defined. Did you mean: 'Message'?
+2025-07-22 10:30:00,706 - app.handlers - ИНФО - 📸 Первое фото сохранено: c:\Users\G\PycharmProjects\Bot __v.1.7 betta_много_кнопок\app\photos\6e9c8d39-f30b-4361-a115-e2a412fd44f6.jpg
+2025-07-22 10:30:02,276 - app.handlers - ИНФО - 📸 Первое фото сохранено: c:\Users\G\PycharmProjects\Bot __v.1.7 betta_много_кнопок\app\photos\354339eb-6b35-43d2-85c6-0c762a118e72.jpg
+2025-07-22 10:30:03,368 - app.handlers - ИНФО - 📸 Второе фото сохранено: c:\Users\G\PycharmProjects\Bot __v.1.7 betta_много_кнопок\app\photos\a15ad386-c405-4554-8da2-3cec362a368b.jpg
+2025-07-22 10:30:11,281 - app.database - ИНФО - Заявка 8193 сохранена в БД с фото: 
+2025-07-22 10:30:11,384 - app.handlers - ИНФО - 📝 Заявка от Катя 2 создана с городом: Балашиха, адресом: Алалал
+2025-07-22 10:30:31,288 - app.handlers - ОШИБКА - Ошибка при восстановлении связи: name 'message' is not defined
+Traceback (most recent call last):
+  File "c:\Users\G\PycharmProjects\Bot __v.1.7 betta_много_кнопок\app\handlers.py", line 2835, in connection_restored
+    storage[group_message_id]["gid"] = message.text
+                                       ^^^^^^^
+NameError: name 'message' is not defined. Did you mean: 'Message'?
+2025-07-22 10:30:35,659 - app.handlers - ОШИБКА - Ошибка при восстановлении связи: name 'message' is not defined
+Traceback (most recent call last):
+  File "c:\Users\G\PycharmProjects\Bot __v.1.7 betta_много_кнопок\app\handlers.py", line 2835, in connection_restored
+    storage[group_message_id]["gid"] = message.text
+                                       ^^^^^^^
+NameError: name 'message' is not defined. Did you mean: 'Message'?
+2025-07-22 10:30:51,502 - app.handlers - ОШИБКА - Ошибка при восстановлении связи: name 'message' is not defined
+Traceback (most recent call last):
+  File "c:\Users\G\PycharmProjects\Bot __v.1.7 betta_много_кнопок\app\handlers.py", line 2835, in connection_restored
+    storage[group_message_id]["gid"] = message.text
+                                       ^^^^^^^
+NameError: name 'message' is not defined. Did you mean: 'Message'?
+2025-07-22 10:32:47,142 - app.handlers - ОШИБКА - Ошибка отправки сообщения: Telegram server says - Bad Request: message to be replied not found
+2025-07-22 10:32:48,262 - app.handlers - ОШИБКА - Ошибка отправки сообщения: Telegram server says - Bad Request: message to be replied not found
+2025-07-22 10:32:49,462 - app.handlers - ОШИБКА - Ошибка отправки сообщения: Telegram server says - Bad Request: message to be replied not found
+2025-07-22 10:32:50,582 - app.handlers - ОШИБКА - Ошибка отправки сообщения: Telegram server says - Bad Request: message to be replied not found
+2025-07-22 10:32:51,702 - app.handlers - ОШИБКА - Ошибка отправки сообщения: Telegram server says - Bad Request: message to be replied not found
+2025-07-22 10:32:51,702 - app.handlers - ПРЕДУПРЕЖДЕНИЕ - Не удалось отправить с привязкой к сообщению 1640: Telegram server says - Bad Request: message to be replied not found
+2025-07-22 10:32:54,822 - app.handlers - ОШИБКА - Ошибка отправки сообщения: Telegram server says - Bad Request: message to be replied not found
+2025-07-22 10:32:55,949 - app.handlers - ОШИБКА - Ошибка отправки сообщения: Telegram server says - Bad Request: message to be replied not found
+2025-07-22 10:32:57,123 - app.handlers - ОШИБКА - Ошибка отправки сообщения: Telegram server says - Bad Request: message to be replied not found
+2025-07-22 10:32:58,343 - app.handlers - ОШИБКА - Ошибка отправки сообщения: Telegram server says - Bad Request: message to be replied not found
+2025-07-22 10:32:59,467 - app.handlers - ОШИБКА - Ошибка отправки сообщения: Telegram server says - Bad Request: message to be replied not found
+2025-07-22 10:32:59,467 - app.handlers - ПРЕДУПРЕЖДЕНИЕ - Не удалось отправить с привязкой к сообщению 1640, отправляем без привязки: Telegram server says - Bad Request: message to be replied not found
+2025-07-22 10:33:03,096 - app.handlers - ОШИБКА - Ошибка при восстановлении связи: name 'message' is not defined
+Traceback (most recent call last):
+  File "c:\Users\G\PycharmProjects\Bot __v.1.7 betta_много_кнопок\app\handlers.py", line 2835, in connection_restored
+    storage[group_message_id]["gid"] = message.text
+                                       ^^^^^^^
+NameError: name 'message' is not defined. Did you mean: 'Message'?
+2025-07-22 10:33:10,146 - app.handlers - ОШИБКА - Ошибка при восстановлении связи: name 'message' is not defined
+Traceback (most recent call last):
+  File "c:\Users\G\PycharmProjects\Bot __v.1.7 betta_много_кнопок\app\handlers.py", line 2835, in connection_restored
+    storage[group_message_id]["gid"] = message.text
+                                       ^^^^^^^
+NameError: name 'message' is not defined. Did you mean: 'Message'?
+2025-07-22 10:34:00,476 - app.handlers - ОШИБКА - Ошибка отправки сообщения: Telegram server says - Bad Request: message to be replied not found
+2025-07-22 10:34:01,575 - app.handlers - ОШИБКА - Ошибка отправки сообщения: Telegram server says - Bad Request: message to be replied not found
+2025-07-22 10:34:02,688 - app.handlers - ОШИБКА - Ошибка отправки сообщения: Telegram server says - Bad Request: message to be replied not found
+2025-07-22 10:34:03,860 - app.handlers - ОШИБКА - Ошибка отправки сообщения: Telegram server says - Bad Request: message to be replied not found
+2025-07-22 10:34:05,009 - app.handlers - ОШИБКА - Ошибка отправки сообщения: Telegram server says - Bad Request: message to be replied not found
+2025-07-22 10:34:05,010 - app.handlers - ПРЕДУПРЕЖДЕНИЕ - Не удалось отправить с привязкой к сообщению 1640: Telegram server says - Bad Request: message to be replied not found
+2025-07-22 10:34:13,842 - app.handlers - ОШИБКА - Ошибка отправки сообщения: Telegram server says - Bad Request: message to be replied not found
+2025-07-22 10:34:14,982 - app.handlers - ОШИБКА - Ошибка отправки сообщения: Telegram server says - Bad Request: message to be replied not found
+2025-07-22 10:34:16,083 - app.handlers - ОШИБКА - Ошибка отправки сообщения: Telegram server says - Bad Request: message to be replied not found
+2025-07-22 10:34:17,220 - app.handlers - ОШИБКА - Ошибка отправки сообщения: Telegram server says - Bad Request: message to be replied not found
+2025-07-22 10:34:18,422 - app.handlers - ОШИБКА - Ошибка отправки сообщения: Telegram server says - Bad Request: message to be replied not found
+2025-07-22 10:34:18,423 - app.handlers - ПРЕДУПРЕЖДЕНИЕ - Не удалось отправить с привязкой к сообщению 1640, отправляем без привязки: Telegram server says - Bad Request: message to be replied not found
+2025-07-22 10:34:21,364 - app.handlers - ОШИБКА - Ошибка при восстановлении связи: name 'message' is not defined
+Traceback (most recent call last):
+  File "c:\Users\G\PycharmProjects\Bot __v.1.7 betta_много_кнопок\app\handlers.py", line 2835, in connection_restored
+    storage[group_message_id]["gid"] = message.text
+                                       ^^^^^^^
+NameError: name 'message' is not defined. Did you mean: 'Message'?
+2025-07-22 10:34:24,541 - app.handlers - ОШИБКА - Ошибка при восстановлении связи: name 'message' is not defined
+Traceback (most recent call last):
+  File "c:\Users\G\PycharmProjects\Bot __v.1.7 betta_много_кнопок\app\handlers.py", line 2835, in connection_restored
+    storage[group_message_id]["gid"] = message.text
+                                       ^^^^^^^
+NameError: name 'message' is not defined. Did you mean: 'Message'?
+2025-07-22 10:34:40,751 - app.handlers - ИНФО - 📤 Заявка от Кириленко Максим отправлена инженерам с адресом: укенг, GiD: вапрол, тип: OPS
+2025-07-22 10:34:40,870 - app.database - ИНФО - GiD заявки 8187 обновлен: вапрол
+2025-07-22 10:34:51,359 - app.handlers - ОШИБКА - Ошибка при отправке финального фото замены OPS: cannot access local variable 'storage_data' where it is not associated with a value
+Traceback (most recent call last):
+  File "c:\Users\G\PycharmProjects\Bot __v.1.7 betta_много_кнопок\app\handlers.py", line 1101, in ops_final_step
+    city = storage_data.get("city", "Город не указан")  # ← ДОБАВЬ
+           ^^^^^^^^^^^^
+UnboundLocalError: cannot access local variable 'storage_data' where it is not associated with a value
+2025-07-22 10:35:02,577 - app.handlers - ОШИБКА - Ошибка при отправке финального фото замены OPS: cannot access local variable 'storage_data' where it is not associated with a value
+Traceback (most recent call last):
+  File "c:\Users\G\PycharmProjects\Bot __v.1.7 betta_много_кнопок\app\handlers.py", line 1101, in ops_final_step
+    city = storage_data.get("city", "Город не указан")  # ← ДОБАВЬ
+           ^^^^^^^^^^^^
+UnboundLocalError: cannot access local variable 'storage_data' where it is not associated with a value
+2025-07-22 10:35:45,967 - app.handlers - ОШИБКА - Ошибка при восстановлении связи: name 'message' is not defined
+Traceback (most recent call last):
+  File "c:\Users\G\PycharmProjects\Bot __v.1.7 betta_много_кнопок\app\handlers.py", line 2835, in connection_restored
+    storage[group_message_id]["gid"] = message.text
+                                       ^^^^^^^
+NameError: name 'message' is not defined. Did you mean: 'Message'?
+2025-07-22 10:35:46,894 - app.handlers - ОШИБКА - Ошибка при восстановлении связи: name 'message' is not defined
+Traceback (most recent call last):
+  File "c:\Users\G\PycharmProjects\Bot __v.1.7 betta_много_кнопок\app\handlers.py", line 2835, in connection_restored
+    storage[group_message_id]["gid"] = message.text
+                                       ^^^^^^^
+NameError: name 'message' is not defined. Did you mean: 'Message'?
+2025-07-22 10:36:23,394 - app.handlers - ИНФО - 👤 Пользователь Руслан Керейтов (ID: 553143249) начал регистрацию
+2025-07-22 10:36:35,365 - app.handlers - ОШИБКА - Ошибка при отправке финального фото замены OPS: cannot access local variable 'storage_data' where it is not associated with a value
+Traceback (most recent call last):
+  File "c:\Users\G\PycharmProjects\Bot __v.1.7 betta_много_кнопок\app\handlers.py", line 1101, in ops_final_step
+    city = storage_data.get("city", "Город не указан")  # ← ДОБАВЬ
+           ^^^^^^^^^^^^
+UnboundLocalError: cannot access local variable 'storage_data' where it is not associated with a value
+2025-07-22 10:36:42,463 - app.handlers - ИНФО - 🏙️ Пользователь Руслан Керейтов ввел город: хацапетовка
+2025-07-22 10:37:20,502 - app.handlers - ИНФО - 📍 Пользователь Руслан Керейтов ввел адрес: ох ты ж...хорошая графа)
+2025-07-22 10:37:26,142 - app.handlers - ОШИБКА - Ошибка при отправке финального фото замены OPS: cannot access local variable 'storage_data' where it is not associated with a value
+Traceback (most recent call last):
+  File "c:\Users\G\PycharmProjects\Bot __v.1.7 betta_много_кнопок\app\handlers.py", line 1101, in ops_final_step
+    city = storage_data.get("city", "Город не указан")  # ← ДОБАВЬ
+           ^^^^^^^^^^^^
+UnboundLocalError: cannot access local variable 'storage_data' where it is not associated with a value
+2025-07-22 10:37:36,011 - app.handlers - ИНФО - 📸 Первое фото сохранено: c:\Users\G\PycharmProjects\Bot __v.1.7 betta_много_кнопок\app\photos\54b36585-5dbe-46f3-ac9e-5343421c5871.jpg
+2025-07-22 10:37:55,573 - app.handlers - ИНФО - 📸 Второе фото сохранено: c:\Users\G\PycharmProjects\Bot __v.1.7 betta_много_кнопок\app\photos\1482108c-9895-4b2b-b35b-a2bcd437d0a4.jpg
+2025-07-22 10:38:06,544 - app.database - ИНФО - Заявка 8213 сохранена в БД с фото: 
+2025-07-22 10:38:06,689 - app.handlers - ИНФО - 📝 Заявка от Руслан Керейтов создана с городом: хацапетовка, адресом: ох ты ж...хорошая графа)

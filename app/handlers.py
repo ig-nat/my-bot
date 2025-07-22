@@ -2832,7 +2832,7 @@ async def connection_restored(callback: CallbackQuery):
         
         # Обновляем статус заявки
         storage[group_message_id]["is_accepted"] = True
-        storage[group_message_id]["gid"] = message.text
+       
         if redis_client is not None:
             redis_client.update_request(str(group_message_id), {
 
