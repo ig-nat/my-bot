@@ -2989,15 +2989,7 @@ async def ignore_callback(callback: CallbackQuery):
     await callback.answer()
 
 
-@router.callback_query(F.data == "contact_user")
-async def contact_user(callback: CallbackQuery):
-    try:
-        # ... существующий код ...
-        await callback.answer("✅ Ссылка создана")
-        
-    except Exception as e:
-        logger.error(f"Ошибка при создании связи с монтажником: {str(e)}", exc_info=True)
-        await callback.answer("❌ Ошибка при создании ссылки")
+
 
 # ← ВСТАВЬ СЮДА НОВЫЙ ОБРАБОТЧИК
 @router.callback_query(F.data == "copy_address")
